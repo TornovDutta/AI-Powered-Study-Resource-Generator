@@ -15,8 +15,6 @@ public class NoteService {
                 "closing statements—only the note content.";
 
         String note=openAi.getResponse(prompt);
-
-
         return new ResponseEntity<>(note, HttpStatus.OK);
 
     }
