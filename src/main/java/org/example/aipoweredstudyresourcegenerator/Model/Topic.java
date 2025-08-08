@@ -15,6 +15,7 @@ public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private String name;
     @OneToMany(mappedBy = "topic" ,cascade = CascadeType.ALL,orphanRemoval = true)
     private List<QuestionsWrapper> questions;
 }

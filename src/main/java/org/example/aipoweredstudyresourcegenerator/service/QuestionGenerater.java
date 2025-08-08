@@ -25,7 +25,9 @@ public class QuestionGenerater {
 
         String response = service.getResponse(prompt);
         Topic topic = new Topic();
+        topic.setName(topicName);
         topicRepository.save(topic);
+
 
         String[] questionsArray = response.split("Question:");
         for (String qBlock : questionsArray) {
