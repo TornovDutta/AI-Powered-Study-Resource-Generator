@@ -20,7 +20,7 @@ public class TestService {
     public List<Questions> testGenerator(String topic){
         generator.generated(topic);
         List<QuestionsWrapper> questionsWrapper=questionRepo.findByTopic(topic);
-        List<Questions> questions= null;
+        List<Questions> questions= new ArrayList<>();
         for(QuestionsWrapper question:questionsWrapper){
             Questions q=new Questions();
             q.setId(question.getId());
