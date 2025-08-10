@@ -36,7 +36,7 @@ public class QuestionGenerater {
             String[] lines = qBlock.trim().split("\n");
             QuestionsWrapper q = new QuestionsWrapper();
 
-            q.setQuestion(lines[0].trim()); // The question line
+            q.setQuestion(lines[0].trim());
 
             for (String line : lines) {
                 if (line.startsWith("A)")) q.setOptionA(line.substring(2).trim());
