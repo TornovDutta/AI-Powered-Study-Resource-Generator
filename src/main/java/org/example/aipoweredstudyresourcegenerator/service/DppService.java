@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TestService {
+public class DppService {
 
     @Autowired
     private QuestionGenerater generator;
