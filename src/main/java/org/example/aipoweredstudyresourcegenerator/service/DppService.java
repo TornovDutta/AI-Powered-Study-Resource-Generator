@@ -25,7 +25,7 @@ public class DppService {
 
     public List<Questions> dppGenerator(String topicName) {
 
-        if(!topicRepo.findAll().contains(topicName)){
+        if(!topicRepo.existsByName(topicName)){
             generator.generated(topicName);
         }
 
