@@ -7,7 +7,6 @@ import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
 import org.example.aipoweredstudyresourcegenerator.Model.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class DppService {
     private TopicRepo topicRepo;
 
 
-    public List<Questions> testGenerator(String topicName) {
+    public List<Questions> dppGenerator(String topicName) {
 
         if(!topicRepo.findAll().contains(topicName)){
             generator.generated(topicName);
