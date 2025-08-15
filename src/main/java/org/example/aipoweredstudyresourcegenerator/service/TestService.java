@@ -26,7 +26,7 @@ public class TestService {
 
     public List<Questions> testGenerator(String topicName) {
 
-        if(!topicRepo.findAll().contains(topicName)){
+        if(!topicRepo.existsByName(topicName)){
             generator.generated(topicName);
         }
 
