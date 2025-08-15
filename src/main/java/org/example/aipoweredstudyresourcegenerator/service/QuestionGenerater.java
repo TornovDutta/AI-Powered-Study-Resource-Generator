@@ -18,9 +18,10 @@ public class QuestionGenerater {
 
     @Autowired
     private QuestionRepo questionsWrapperRepository;
+    static final int number=10;
 
     public ResponseEntity<String> generated(String topicName){
-        String prompt = "Generate 10 MCQs on the topic: " + topicName + ". Format like this:\n" +
+        String prompt = "Generate "+ number+" MCQs on the topic: " + topicName + ". Format like this:\n" +
                 "Question: ...\nA) ...\nB) ...\nC) ...\nD) ...\nAnswer: ...";
 
         String response = service.getResponse(prompt);
