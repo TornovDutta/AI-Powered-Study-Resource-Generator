@@ -30,11 +30,9 @@ public class DppService {
         }
 
 
-
-
-
         Topic topicEntity = topicRepo.findByName(topicName)
                 .orElseThrow(() -> new RuntimeException("Topic not found: " + topicName));
+
 
 
         List<QuestionsWrapper> questionsWrapperList = questionRepo.findByTopic(topicEntity);
