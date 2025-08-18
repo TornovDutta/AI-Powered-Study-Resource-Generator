@@ -32,8 +32,6 @@ public class TestService {
 
 
 
-
-
         Topic topicEntity = topicRepo.findByName(topicName)
                 .orElseThrow(() -> new RuntimeException("Topic not found: " + topicName));
 
