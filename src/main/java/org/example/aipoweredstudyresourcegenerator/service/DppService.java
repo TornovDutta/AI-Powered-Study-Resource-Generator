@@ -6,6 +6,8 @@ import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
 import org.example.aipoweredstudyresourcegenerator.Model.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +23,9 @@ public class DppService {
 
     @Autowired
     private TopicRepo topicRepo;
+
+    @Autowired
+    private JavaMailSender mail;
 
 
     public List<Questions> dppGenerator(String topicName) {
@@ -47,5 +52,14 @@ public class DppService {
         }
 
         return questionsList;
+    }
+
+    public void sendMail(String topic) {
+        SimpleMailMessage message=new SimpleMailMessage();
+        message.setTo("tornovdutta20@gmail.com");
+        message.setFrom("tornovdutta@gmail.com");
+        message.setText("Dpp start on "+topic);
+        message.setSubject("Remainder");
+        mail.send(message);
     }
 }

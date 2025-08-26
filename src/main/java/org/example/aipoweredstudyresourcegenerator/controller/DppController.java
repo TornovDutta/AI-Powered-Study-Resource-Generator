@@ -34,6 +34,7 @@ public class DppController {
         if(topic.isEmpty()){
             return new ResponseEntity<>(new ArrayList<>(),HttpStatus.OK);
         }
+        service.sendMail(topic);
         return new ResponseEntity<>(service.dppGenerator(topic),HttpStatus.OK);
     }
 
