@@ -3,7 +3,7 @@ package org.example.aipoweredstudyresourcegenerator.Model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class DppRequested {
+public class TestRequested {
     String topic;
     LocalDate date;
     LocalTime time;

@@ -1,6 +1,5 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
-import org.aspectj.weaver.patterns.TypePatternQuestions;
-import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
+import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
 
@@ -28,9 +27,9 @@ public class DppController {
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
     @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody DppRequested dppRequested){
-        topic = dppRequested.getTopic();
-        LocalDateTime dateTime = LocalDateTime.of(dppRequested.getDate(), dppRequested.getTime());
+    public ResponseEntity<String> createDpp(@RequestBody TestRequested testRequested){
+        topic = testRequested.getTopic();
+        LocalDateTime dateTime = LocalDateTime.of(testRequested.getDate(), testRequested.getTime());
 
         dynamicScheduler.schedule(() -> {
 

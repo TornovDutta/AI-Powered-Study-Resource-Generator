@@ -1,14 +1,13 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
 
 
-import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
+import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
 import org.example.aipoweredstudyresourcegenerator.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -27,9 +26,9 @@ public class TestController {
         return new ResponseEntity<>(service.testGenerator(topic), HttpStatus.OK);
     }
     @PostMapping("testStart")
-    public ResponseEntity<String> createTest(@RequestBody DppRequested dppRequested){
-        topic = dppRequested.getTopic();
-        LocalDateTime dateTime = LocalDateTime.of(dppRequested.getDate(), dppRequested.getTime());
+    public ResponseEntity<String> createTest(@RequestBody TestRequested testRequested){
+        topic = testRequested.getTopic();
+        LocalDateTime dateTime = LocalDateTime.of(testRequested.getDate(), testRequested.getTime());
 
         dynamicScheduler.schedule(() -> {
 
