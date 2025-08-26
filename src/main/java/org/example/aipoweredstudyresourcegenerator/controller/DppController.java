@@ -18,8 +18,8 @@ public class DppController {
     @Autowired
     private DppService service;
 
-    @Autowired
-    private SchedulerConfig scheduler;
+//    @Autowired
+//    private SchedulerConfig scheduler;
     @GetMapping("create")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
