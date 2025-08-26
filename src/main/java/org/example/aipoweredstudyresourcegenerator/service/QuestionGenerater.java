@@ -21,8 +21,17 @@ public class QuestionGenerater {
     static final int number=10;
 
     public ResponseEntity<String> generated(String topicName){
-        String prompt = "Generate "+ number+" MCQs on the topic: " + topicName + ". Format like this:\n" +
-                "Question: ...\nA) ...\nB) ...\nC) ...\nD) ...\nAnswer: ...";
+        String prompt = "Generate " + number + " multiple choice questions (MCQs) on the topic: "
+                + topicName + ".\n"
+                + "Strictly use the following format for each question:\n\n"
+                + "Question: <question text>\n"
+                + "A) <option A>\n"
+                + "B) <option B>\n"
+                + "C) <option C>\n"
+                + "D) <option D>\n"
+                + "Answer: <correct option letter>\n\n"
+                + "Do not include explanations, only follow this exact format for each question.";
+
 
         String response = service.getResponse(prompt);
         Topic topic = new Topic();
