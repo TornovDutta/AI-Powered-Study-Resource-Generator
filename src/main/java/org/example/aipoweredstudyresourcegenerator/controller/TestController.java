@@ -26,8 +26,8 @@ public class TestController {
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.testGenerator(topic), HttpStatus.OK);
     }
-    @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody DppRequested dppRequested){
+    @PostMapping("testStart")
+    public ResponseEntity<String> createTest(@RequestBody DppRequested dppRequested){
         topic = dppRequested.getTopic();
         LocalDateTime dateTime = LocalDateTime.of(dppRequested.getDate(), dppRequested.getTime());
 
@@ -41,8 +41,8 @@ public class TestController {
     }
 
 
-    @DeleteMapping("dppStop")
-    public ResponseEntity<String> stopDpp(){
+    @DeleteMapping("testStop")
+    public ResponseEntity<String> stopTest(){
         boolean stopped = dynamicScheduler.stop();
         topic = "";
         if(stopped) {
