@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 public class QuestionsWrapper {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String Question;
     private String OptionA;

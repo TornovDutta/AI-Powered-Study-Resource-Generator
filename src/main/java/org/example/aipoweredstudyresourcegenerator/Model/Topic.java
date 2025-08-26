@@ -13,7 +13,7 @@ import java.util.List;
 @Entity
 public class Topic {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
     @OneToMany(mappedBy = "topic" ,cascade = CascadeType.ALL,orphanRemoval = true)
