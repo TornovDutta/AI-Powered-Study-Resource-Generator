@@ -1,4 +1,5 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
+import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,9 +29,9 @@ public class DppController {
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
     @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody TestRequested testRequested){
-        topic = testRequested.getTopic();
-        LocalDateTime dateTime = LocalDateTime.of(testRequested.getDate(), testRequested.getTime());
+    public ResponseEntity<String> createDpp(@RequestBody DppRequested requested){
+        topic = requested.getTopic();
+        LocalDateTime dateTime = LocalDateTime.of(LocalDate.now(), requested.getTime());
 
         dynamicScheduler.schedule(() -> {
 
