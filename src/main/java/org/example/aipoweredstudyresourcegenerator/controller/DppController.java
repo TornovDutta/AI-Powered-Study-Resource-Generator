@@ -1,4 +1,5 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
+import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.SchedulerConfig;
 import org.example.aipoweredstudyresourcegenerator.service.DppService;
@@ -8,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,18 +18,18 @@ import java.util.List;
 public class DppController {
     String topic="";
 
+
     @Autowired
     private DppService service;
 
-//    @Autowired
-//    private SchedulerConfig scheduler;
     @GetMapping("create")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
     @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody String t){
-        topic=t;
+    public ResponseEntity<String> createDpp(@RequestBody DppRequested dppRequested){
+        topic=dppRequested.getTopic();
+
         return  new ResponseEntity<>("ok",HttpStatus.OK);
     }
     @Scheduled(cron = "0 0 10 * * *")
@@ -36,6 +39,14 @@ public class DppController {
         }
         service.sendMail(topic);
         return new ResponseEntity<>(service.dppGenerator(topic),HttpStatus.OK);
+    }
+    public String generatedCons(LocalTime time, LocalDate date){
+        int minute=time.getMinute();
+        int hour=time.getHour();
+        int day=date.getDayOfMonth();
+        int month=date.getMonthValue();
+        int year=date.lengthOfYear();
+        return String.format("0 %d %d %d %d ? %d", minute, hour, day, month, year);
     }
 
     @DeleteMapping("dppStop")
