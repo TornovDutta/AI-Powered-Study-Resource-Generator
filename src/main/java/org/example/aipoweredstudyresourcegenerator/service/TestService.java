@@ -54,11 +54,11 @@ public class TestService {
 
         return questionsList;
     }
-    public void sendMail(String topic) {
+    public void sendMail(String topic, List<Questions> questionsList) {
         SimpleMailMessage message=new SimpleMailMessage();
         message.setTo("tornovdutta20@gmail.com");
         message.setFrom("tornovdutta@gmail.com");
-        message.setText("Dpp start on "+topic);
+        message.setText("Dpp start on "+topic+"/n"+questionsList);
         message.setSubject("Remainder");
         mail.send(message);
     }
