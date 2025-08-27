@@ -19,4 +19,9 @@ public class NoteController {
     public ResponseEntity<List <Note>> createNote(@RequestParam String topic){
         return service.getNote(topic);
     }
+
+    @GetMapping("hello")
+    public String geeting(){
+        return  "hello";
+    }
 }
