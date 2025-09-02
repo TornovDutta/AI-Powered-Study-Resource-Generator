@@ -28,9 +28,10 @@ The system automatically schedules DPPs and tests and sends email reminders to s
 - OpenAI API (ChatGPT/GPT models)
 
 **Others:**
-- Spring Scheduler / Quartz (for DPP/Test scheduling)
+- Spring Scheduler (for DPP/Test scheduling)
 - JavaMailSender (for email reminders)
 - Lombok (reduce boilerplate code)
+- Spring Dotenv (for environment variables)
 
 ---
 
@@ -38,32 +39,54 @@ The system automatically schedules DPPs and tests and sends email reminders to s
 
 ### 1️⃣ Clone the repository
 ```bash
-git clone https://github.com/yourusername/ai-study-material.git
-cd ai-study-material
+
+git clone https://github.com/TornovDutta/AI-Powered-Study-Resource-Generator.git
+cd AI-Powered-Study-Resource-Generator
+
 ```
 
 ### 2️⃣ Configure Database
-Update `application.properties` or `application.yml`:
+Update `application.properties`  with environment variables:
+
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/ai_study
-spring.datasource.username=root
-spring.datasource.password=yourpassword
+# Database
+spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
+spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
+spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=update
+
 ```
 
 ### 3️⃣ Add OpenAI API Key
 ```properties
-openai.api.key=YOUR_OPENAI_API_KEY
+# AI
+spring.ai.openai.api-key=${SPRING_AI_OPENAI_API_KEY}
+spring.ai.openai.chat.model=${SPRING_AI_OPENAI_CHAT_MODEL}
+
 ```
 
 ### 4️⃣ Configure Email Settings
 ```properties
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=your-email@gmail.com
-spring.mail.password=your-app-password
+# Mail
+spring.mail.host=${SPRING_MAIL_HOST}
+spring.mail.port=${SPRING_MAIL_PORT}
+spring.mail.username=${SPRING_MAIL_USERNAME}
+spring.mail.password=${SPRING_MAIL_PASSWORD}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
+email.from=${EMAIL_FROM}
+
+```
+
+### 4️⃣ Configure OAuth
+```properties
+# OAuth
+spring.security.oauth2.client.registration.github.client-id=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
+spring.security.oauth2.client.registration.github.client-secret=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
+
+
 ```
 
 ### 5️⃣ Build & Run
@@ -95,12 +118,13 @@ mvn spring-boot:run
 
 ## 📂 Project Structure
 ```
-src/main/java/com/example/aiStudyMaterial
-│── controller/      # API endpoints
-│── service/         # Business logic
-│── repository/      # JPA repositories
-│── model/           # Entities (User, Notes, DPP, Test, etc.)
-│── scheduler/       # Scheduled tasks for DPP/Test
+src/main/java/org/example/aipoweredstudyresourcegenerator
+│── config/ # Configuration classes (security, AI, etc.)
+│── controller/ # REST API endpoints
+│── DAO/ # Data Access Objects / Repositories
+│── Model/ # Entities (User, Questions, Topic, etc.)
+│── service/ # Business logic & services
+│── AiPoweredStudyResourceGeneratorApplication.java # Main Spring Boot application
 ```
 
 ---
