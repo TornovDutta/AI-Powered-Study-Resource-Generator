@@ -97,42 +97,38 @@ mvn spring-boot:run
 
 ---
 
-## 📡 REST API Endpoints
 
-| Method | Endpoint               | Description |
-|--------|------------------------|-------------|
-| **POST**   | `/notes/generate`       | Generate AI-powered study notes for a given topic. |
-| **GET**    | `/notes/{id}`           | Get a specific note by its ID. |
-| **GET**    | `/notes`                | Get all generated notes. |
-| **POST**   | `/dpp/generate`         | Generate a Daily Practice Paper (DPP) for a given topic. |
-| **GET**    | `/dpp/{id}`             | Get a specific DPP by its ID. |
-| **GET**    | `/dpp`                  | Get all generated DPPs. |
-| **POST**   | `/tests/generate`       | Generate a test for a given topic. |
-| **GET**    | `/tests/{id}`           | Get a specific test by its ID. |
-| **GET**    | `/tests`                | Get all generated tests. |
-| **POST**   | `/schedule/dpp`         | Schedule a DPP at a specific date/time. |
-| **POST**   | `/schedule/test`        | Schedule a test at a specific date/time. |
-| **POST**   | `/email/reminder`       | Send a manual email reminder. |
+## 📌 API Endpoints
+
+| Method | Endpoint       | Parameters                                                                 | Description |
+|--------|---------------|-----------------------------------------------------------------------------|-------------|
+| GET    | `/note`       | `topic` (query param, String)                                               | Generates and returns study notes for the given topic. |
+| GET    | `/hello`      | None                                                                        | Simple test endpoint that returns `"hello"`. |
+| GET    | `/create`     | `topic` (in request body, String)                                           | Generates test questions for the given topic. |
+| POST   | `/testStart`  | Request Body: <br>• `topic` (String) <br>• `date` (LocalDate) <br>• `time` (LocalTime) | Schedules a test generation at the given date and time. Sends questions via email. |
+| DELETE | `/testStop`   | None                                                                        | Stops the currently scheduled test. |
+| GET    | `/testCreate` | `topic` (in request body, String)                                           | Generates DPP (Daily Practice Paper) questions for the given topic. |
+| POST   | `/dppStart`   | Request Body: <br>• `topic` (String) <br>• `time` (LocalTime)               | Schedules DPP generation at the given time. Sends questions via email. |
+| DELETE | `/dppStop`    | None                                                                        | Stops the currently scheduled DPP. |
+
+---
 
 ---
 
 ## 📂 Project Structure
 ```
 src/main/java/org/example/aipoweredstudyresourcegenerator
-│── config/ # Configuration classes (security, AI, etc.)
+│── config/ # Configuration classes 
 │── controller/ # REST API endpoints
 │── DAO/ # Data Access Objects / Repositories
-│── Model/ # Entities (User, Questions, Topic, etc.)
+│── Model/ # Entities 
 │── service/ # Business logic & services
 │── AiPoweredStudyResourceGeneratorApplication.java # Main Spring Boot application
 ```
 
 ---
 
-## 📜 License
-This project is licensed under the MIT License.
 
----
 
 ## 👨‍💻 Author
 **Tornov Dutta**  
