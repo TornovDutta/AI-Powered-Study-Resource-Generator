@@ -100,16 +100,16 @@ mvn spring-boot:run
 
 ## 📌 API Endpoints
 
-| Method | Endpoint       | Parameters                                                                 | Description |
-|--------|---------------|-----------------------------------------------------------------------------|-------------|
-| GET    | `/note`       | `topic` (query param, String)                                               | Generates and returns study notes for the given topic. |
-| GET    | `/hello`      | None                                                                        | Simple test endpoint that returns `"hello"`. |
-| GET    | `/create`     | `topic` (in request body, String)                                           | Generates test questions for the given topic. |
-| POST   | `/testStart`  | Request Body: <br>• `topic` (String) <br>• `date` (LocalDate) <br>• `time` (LocalTime) | Schedules a test generation at the given date and time. Sends questions via email. |
-| DELETE | `/testStop`   | None                                                                        | Stops the currently scheduled test. |
-| GET    | `/testCreate` | `topic` (in request body, String)                                           | Generates DPP (Daily Practice Paper) questions for the given topic. |
-| POST   | `/dppStart`   | Request Body: <br>• `topic` (String) <br>• `time` (LocalTime)               | Schedules DPP generation at the given time. Sends questions via email. |
-| DELETE | `/dppStop`    | None                                                                        | Stops the currently scheduled DPP. |
+| Method | Endpoint     | Parameters                                                                 | Description |
+|--------|--------------|-----------------------------------------------------------------------------|-------------|
+| GET    | `/note`      | `topic` (query param, String)                                               | Generates and returns study notes for the given topic. |
+| GET    | `/hello`     | None                                                                        | Simple test endpoint that returns `"hello"`. |
+| GET    | `/create`    | `topic` (in request body, String)                                           | Generates test questions for the given topic. |
+| POST   | `/testStart` | Request Body: <br>• `topic` (String) <br>• `date` (LocalDate) <br>• `time` (LocalTime) | Schedules a test generation at the given date and time. Sends questions via email. |
+| DELETE | `/testStop`  | None                                                                        | Stops the currently scheduled test. |
+| GET    | `dppCreate`  | `topic` (in request body, String)                                           | Generates <br/>DPP (Daily Practice Paper) questions for the given topic. |
+| POST   | `/dppStart`  | Request Body: <br>• `topic` (String) <br>• `time` (LocalTime)               | Schedules DPP generation at the given time. Sends questions via email. |
+| DELETE | `/dppStop`   | None                                                                        | Stops the currently scheduled DPP. |
 
 ---
 

@@ -24,7 +24,7 @@ public class DppController {
     @Autowired
     private DynamicSchedule dynamicScheduler;
 
-    @GetMapping("testCreate")
+    @GetMapping("dppCreate")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
