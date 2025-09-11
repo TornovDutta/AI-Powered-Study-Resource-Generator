@@ -83,8 +83,8 @@ email.from=${EMAIL_FROM}
 ### 4️⃣ Configure OAuth
 ```properties
 # OAuth
-spring.security.oauth2.client.registration.github.client-id=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
-spring.security.oauth2.client.registration.github.client-secret=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
+spring.security.oauth2.client.registration.github.client-id=${OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
+spring.security.oauth2.client.registration.github.client-secret=${OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
 
 
 ```
