@@ -50,10 +50,10 @@ Update `application.properties`  with environment variables:
 
 ```properties
 # Database
-spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.driver-class-name=${DATASOURCE_DRIVER_CLASS_NAME}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+spring.datasource.url=${DATASOURCE_URL}
 spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=update
 
@@ -62,18 +62,18 @@ spring.jpa.hibernate.ddl-auto=update
 ### 3️⃣ Add OpenAI API Key
 ```properties
 # AI
-spring.ai.openai.api-key=${SPRING_AI_OPENAI_API_KEY}
-spring.ai.openai.chat.model=${SPRING_AI_OPENAI_CHAT_MODEL}
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.model=${OPENAI_CHAT_MODEL}
 
 ```
 
 ### 4️⃣ Configure Email Settings
 ```properties
 # Mail
-spring.mail.host=${SPRING_MAIL_HOST}
-spring.mail.port=${SPRING_MAIL_PORT}
-spring.mail.username=${SPRING_MAIL_USERNAME}
-spring.mail.password=${SPRING_MAIL_PASSWORD}
+spring.mail.host=${MAIL_HOST}
+spring.mail.port=${MAIL_PORT}
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 email.from=${EMAIL_FROM}
