@@ -103,7 +103,6 @@ mvn spring-boot:run
 | Method | Endpoint     | Parameters                                                                 | Description |
 |--------|--------------|-----------------------------------------------------------------------------|-------------|
 | GET    | `/note`      | `topic` (query param, String)                                               | Generates and returns study notes for the given topic. |
-| GET    | `/hello`     | None                                                                        | Simple test endpoint that returns `"hello"`. |
 | GET    | `/create`    | `topic` (in request body, String)                                           | Generates test questions for the given topic. |
 | POST   | `/testStart` | Request Body: <br>• `topic` (String) <br>• `date` (LocalDate) <br>• `time` (LocalTime) | Schedules a test generation at the given date and time. Sends questions via email. |
 | DELETE | `/testStop`  | None                                                                        | Stops the currently scheduled test. |
