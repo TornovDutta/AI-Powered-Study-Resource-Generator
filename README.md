@@ -99,16 +99,16 @@ mvn spring-boot:run
 
 ## 📚 API Endpoints
 
-| Endpoint            | Method  | Description                                        | Request Body Example                                                                 | Response Example |
-|---------------------|---------|----------------------------------------------------|---------------------------------------------------------------------------------------|-----------------|
-| `/notes`            | GET     | Get study notes for a topic                        | Query param: `?topic=Physics`                                                         | `{ "topic": "Physics", "notes": "Physics is the study of matter..." }` |
-| `/tests`            | POST    | Generate test questions for a topic                | `{ "topic": "Mathematics" }`                                                          | `{ "questions": [...] }` |
-| `/tests/schedule`   | POST    | Schedule a test at a given date & time, sent via email | `{ "topic": "Chemistry", "date": "2025-09-12", "time": "09:00" }`                     | `{ "status": "scheduled", "topic": "Chemistry" }` |
-| `/tests/schedule`   | DELETE  | Cancel a scheduled test                            | N/A                                                                                   | `{ "status": "success", "message": "Scheduled test stopped successfully" }` |
-| `/dpp`              | POST    | Generate a Daily Practice Paper (DPP) for a topic  | `{ "topic": "Biology" }`                                                              | `{ "questions": [...] }` |
-| `/dpp/schedule`     | POST    | Schedule DPP generation at a given time            | `{ "topic": "Mathematics", "time": "20:00" }`                                         | `{ "status": "scheduled", "topic": "Mathematics" }` |
-| `/dpp/schedule`     | DELETE  | Cancel a scheduled DPP                             | N/A                                                                                   | `{ "status": "success", "message": "Scheduled DPP stopped successfully" }` |
-| `/hello`            | GET     | Health check endpoint                              | N/A                                                                                   | `{ "message": "hello" }` |
+| Endpoint            | Method | Description                                            | Request Body Example                                                                 | Response Example |
+|---------------------|--------|--------------------------------------------------------|---------------------------------------------------------------------------------------|-----------------|
+| `/notes`            | POST   | Generated study notes for a topic                      | Query param: `?topic=Physics`                                                         | `{ "topic": "Physics", "notes": "Physics is the study of matter..." }` |
+| `/tests`            | POST   | Generate test questions for a topic                    | `{ "topic": "Mathematics" }`                                                          | `{ "questions": [...] }` |
+| `/tests/schedule`   | POST   | Schedule a test at a given date & time, sent via email | `{ "topic": "Chemistry", "date": "2025-09-12", "time": "09:00" }`                     | `{ "status": "scheduled", "topic": "Chemistry" }` |
+| `/tests/schedule`   | DELETE | Cancel a scheduled test                                | N/A                                                                                   | `{ "status": "success", "message": "Scheduled test stopped successfully" }` |
+| `/dpp`              | POST   | Generate a Daily Practice Paper (DPP) for a topic      | `{ "topic": "Biology" }`                                                              | `{ "questions": [...] }` |
+| `/dpp/schedule`     | POST   | Schedule DPP generation at a given time                | `{ "topic": "Mathematics", "time": "20:00" }`                                         | `{ "status": "scheduled", "topic": "Mathematics" }` |
+| `/dpp/schedule`     | DELETE | Cancel a scheduled DPP                                 | N/A                                                                                   | `{ "status": "success", "message": "Scheduled DPP stopped successfully" }` |
+| `/hello`            | GET    | Health check endpoint                                  | N/A                                                                                   | `{ "message": "hello" }` |
 
 ---
 
