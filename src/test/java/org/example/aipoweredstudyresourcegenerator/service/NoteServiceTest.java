@@ -45,6 +45,7 @@ class NoteServiceTest {
         assertEquals(generatedNote, response.getBody().get(0).getNote());
 
         verify(repo, times(1)).save(any(Note.class));
+        System.out.println("Ok");
     }
 
     @Test
@@ -62,5 +63,6 @@ class NoteServiceTest {
 
         verify(openAi, never()).getResponse(anyString());
         verify(repo, never()).save(any(Note.class));
+        System.out.println("Ok");
     }
 }
