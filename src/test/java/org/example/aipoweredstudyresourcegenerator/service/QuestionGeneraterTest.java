@@ -9,6 +9,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static reactor.core.publisher.Mono.when;
+
 class QuestionGeneraterTest {
     @Mock
     private OpenAIService service;
@@ -27,6 +29,7 @@ class QuestionGeneraterTest {
     void generated() {
         String input="java";
         String output="ok";
+
 
 
     }
