@@ -1,6 +1,7 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
 
 
+import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
@@ -15,18 +16,19 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/tests/")
 public class TestController {
     String topic;
     @Autowired
     private TestService service;
     @Autowired
     private DynamicSchedule dynamicScheduler;
-    @GetMapping("create")
+    @PostMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.testGenerator(topic), HttpStatus.OK);
     }
-    @PostMapping("testStart")
-    public ResponseEntity<String> createTest(@RequestBody TestRequested testRequested){
+    @PostMapping("/schedule")
+    public ResponseEntity<Status> createTest(@RequestBody TestRequested testRequested){
         topic = testRequested.getTopic();
         LocalDateTime dateTime = LocalDateTime.of(testRequested.getDate(), testRequested.getTime());
 
@@ -35,16 +37,18 @@ public class TestController {
             List<Questions> questions=service.testGenerator(topic);
             service.sendMail(topic,questions);
         }, dateTime);
+        Status status=new Status("scheduled", testRequested.getTopic());
 
-        return new ResponseEntity<>("Scheduled successfully", HttpStatus.OK);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("testStop")
+    @DeleteMapping("/schedule")
     public ResponseEntity<String> stopTest(){
         boolean stopped = dynamicScheduler.stop();
         topic = "";
         if(stopped) {
+            Status status=new Status("success","Scheduled test stopped successfully");
             return new ResponseEntity<>("Scheduler stopped", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("No active scheduler to stop", HttpStatus.OK);

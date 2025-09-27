@@ -50,10 +50,10 @@ Update `application.properties`  with environment variables:
 
 ```properties
 # Database
-spring.datasource.driver-class-name=${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-spring.datasource.url=${SPRING_DATASOURCE_URL}
+spring.datasource.driver-class-name=${DATASOURCE_DRIVER_CLASS_NAME}
+spring.datasource.username=${DATASOURCE_USERNAME}
+spring.datasource.password=${DATASOURCE_PASSWORD}
+spring.datasource.url=${DATASOURCE_URL}
 spring.jpa.show-sql=true
 spring.jpa.hibernate.ddl-auto=update
 
@@ -62,18 +62,18 @@ spring.jpa.hibernate.ddl-auto=update
 ### 3️⃣ Add OpenAI API Key
 ```properties
 # AI
-spring.ai.openai.api-key=${SPRING_AI_OPENAI_API_KEY}
-spring.ai.openai.chat.model=${SPRING_AI_OPENAI_CHAT_MODEL}
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+spring.ai.openai.chat.model=${OPENAI_CHAT_MODEL}
 
 ```
 
 ### 4️⃣ Configure Email Settings
 ```properties
 # Mail
-spring.mail.host=${SPRING_MAIL_HOST}
-spring.mail.port=${SPRING_MAIL_PORT}
-spring.mail.username=${SPRING_MAIL_USERNAME}
-spring.mail.password=${SPRING_MAIL_PASSWORD}
+spring.mail.host=${MAIL_HOST}
+spring.mail.port=${MAIL_PORT}
+spring.mail.username=${MAIL_USERNAME}
+spring.mail.password=${MAIL_PASSWORD}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 email.from=${EMAIL_FROM}
@@ -83,8 +83,8 @@ email.from=${EMAIL_FROM}
 ### 4️⃣ Configure OAuth
 ```properties
 # OAuth
-spring.security.oauth2.client.registration.github.client-id=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
-spring.security.oauth2.client.registration.github.client-secret=${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
+spring.security.oauth2.client.registration.github.client-id=${OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID}
+spring.security.oauth2.client.registration.github.client-secret=${OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET}
 
 
 ```
@@ -97,21 +97,21 @@ mvn spring-boot:run
 
 ---
 
+## 📚 API Endpoints
 
-## 📌 API Endpoints
-
-| Method | Endpoint     | Parameters                                                                 | Description |
-|--------|--------------|-----------------------------------------------------------------------------|-------------|
-| GET    | `/note`      | `topic` (query param, String)                                               | Generates and returns study notes for the given topic. |
-| GET    | `/hello`     | None                                                                        | Simple test endpoint that returns `"hello"`. |
-| GET    | `/create`    | `topic` (in request body, String)                                           | Generates test questions for the given topic. |
-| POST   | `/testStart` | Request Body: <br>• `topic` (String) <br>• `date` (LocalDate) <br>• `time` (LocalTime) | Schedules a test generation at the given date and time. Sends questions via email. |
-| DELETE | `/testStop`  | None                                                                        | Stops the currently scheduled test. |
-| GET    | `dppCreate`  | `topic` (in request body, String)                                           | Generates <br/>DPP (Daily Practice Paper) questions for the given topic. |
-| POST   | `/dppStart`  | Request Body: <br>• `topic` (String) <br>• `time` (LocalTime)               | Schedules DPP generation at the given time. Sends questions via email. |
-| DELETE | `/dppStop`   | None                                                                        | Stops the currently scheduled DPP. |
+| Endpoint            | Method | Description                                            | Request Body Example                                                                 | Response Example |
+|---------------------|--------|--------------------------------------------------------|---------------------------------------------------------------------------------------|-----------------|
+| `/notes`            | POST   | Generated study notes for a topic                      | Query param: `?topic=Physics`                                                         | `{ "topic": "Physics", "notes": "Physics is the study of matter..." }` |
+| `/tests`            | POST   | Generate test questions for a topic                    | `{ "topic": "Mathematics" }`                                                          | `{ "questions": [...] }` |
+| `/tests/schedule`   | POST   | Schedule a test at a given date & time, sent via email | `{ "topic": "Chemistry", "date": "2025-09-12", "time": "09:00" }`                     | `{ "status": "scheduled", "topic": "Chemistry" }` |
+| `/tests/schedule`   | DELETE | Cancel a scheduled test                                | N/A                                                                                   | `{ "status": "success", "message": "Scheduled test stopped successfully" }` |
+| `/dpp`              | POST   | Generate a Daily Practice Paper (DPP) for a topic      | `{ "topic": "Biology" }`                                                              | `{ "questions": [...] }` |
+| `/dpp/schedule`     | POST   | Schedule DPP generation at a given time                | `{ "topic": "Mathematics", "time": "20:00" }`                                         | `{ "status": "scheduled", "topic": "Mathematics" }` |
+| `/dpp/schedule`     | DELETE | Cancel a scheduled DPP                                 | N/A                                                                                   | `{ "status": "success", "message": "Scheduled DPP stopped successfully" }` |
+| `/`                 | GET    | Health check endpoint                                  | N/A                                                                                   | `The application is running` |
 
 ---
+
 
 ---
 
