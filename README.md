@@ -108,7 +108,7 @@ mvn spring-boot:run
 | `/dpp`              | POST   | Generate a Daily Practice Paper (DPP) for a topic      | `{ "topic": "Biology" }`                                                              | `{ "questions": [...] }` |
 | `/dpp/schedule`     | POST   | Schedule DPP generation at a given time                | `{ "topic": "Mathematics", "time": "20:00" }`                                         | `{ "status": "scheduled", "topic": "Mathematics" }` |
 | `/dpp/schedule`     | DELETE | Cancel a scheduled DPP                                 | N/A                                                                                   | `{ "status": "success", "message": "Scheduled DPP stopped successfully" }` |
-| `/hello`            | GET    | Health check endpoint                                  | N/A                                                                                   | `{ "message": "hello" }` |
+| `/`                 | GET    | Health check endpoint                                  | N/A                                                                                   | `The application is running` |
 
 ---
 
