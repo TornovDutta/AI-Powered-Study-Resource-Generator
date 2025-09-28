@@ -1,5 +1,6 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
 import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
+import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/dpp")
 public class DppController {
     String topic="";
 
@@ -24,12 +26,12 @@ public class DppController {
     @Autowired
     private DynamicSchedule dynamicScheduler;
 
-    @GetMapping("dppCreate")
+    @GetMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
-    @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody DppRequested requested){
+    @PostMapping("schedule")
+    public ResponseEntity<Status> createDpp(@RequestBody DppRequested requested){
         topic = requested.getTopic();
         LocalDateTime dateTime = LocalDateTime.of(LocalDate.now(), requested.getTime());
 
@@ -38,19 +40,21 @@ public class DppController {
             List<Questions> questions=service.dppGenerator(topic);
             service.sendMail(topic,questions);
         }, dateTime);
+        Status status=new Status("scheduled",topic);
 
-        return new ResponseEntity<>("Scheduled successfully", HttpStatus.OK);
+        return new ResponseEntity<>(status, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("dppStop")
-    public ResponseEntity<String> stopDpp(){
+    @DeleteMapping("schedule")
+    public ResponseEntity<Status> stopDpp(){
         boolean stopped = dynamicScheduler.stop();
         topic = "";
         if(stopped) {
-            return new ResponseEntity<>("Scheduler stopped", HttpStatus.OK);
+            Status status=new Status("success","Scheduled DPP stopped successfully");
+            return new ResponseEntity<>(status, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("No active scheduler to stop", HttpStatus.OK);
+            return null;
         }
     }
 }

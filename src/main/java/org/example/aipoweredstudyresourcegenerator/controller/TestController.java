@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
 
 import java.util.List;
@@ -44,14 +45,14 @@ public class TestController {
 
 
     @DeleteMapping("/schedule")
-    public ResponseEntity<String> stopTest(){
+    public ResponseEntity<Status> stopTest(){
         boolean stopped = dynamicScheduler.stop();
         topic = "";
         if(stopped) {
             Status status=new Status("success","Scheduled test stopped successfully");
-            return new ResponseEntity<>("Scheduler stopped", HttpStatus.OK);
+            return new ResponseEntity<>(status, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("No active scheduler to stop", HttpStatus.OK);
+            return null;
         }
     }
 }
