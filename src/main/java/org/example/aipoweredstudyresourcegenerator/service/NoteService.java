@@ -18,20 +18,17 @@ public class NoteService {
     private NoteRepo repo;
 
     public ResponseEntity<List<Note>> getNote(String topic) {
-        String note="";
-        if(!repo.existsByTopic(topic)){
-            String prompt = "Write a detailed study note on the topic: " + topic + ". Do not include any introductory or " +
-                    "closing statements—only the note content.";
-
-            note=openAi.getResponse(prompt);
-            Note newnote=new Note();
-            newnote.setTopic(topic);
-            newnote.setNote(note);
-            repo.save(newnote);
+        boolean exists = repo.existsByTopic(topic);
+        if (!exists) {
+            String prompt = "Write a detailed study note on the topic: " + topic;
+            String note = openAi.getResponse(prompt);
+            Note newNote = new Note();
+            newNote.setTopic(topic);
+            newNote.setNote(note);
+            repo.save(newNote);
         }
-        List<Note> result=repo.findByTopic(topic);
-
-        return new ResponseEntity<>(result, HttpStatus.OK);
-
+        List<Note> result = repo.findByTopic(topic);
+        return new ResponseEntity<>(result, exists ? HttpStatus.OK : HttpStatus.CREATED);
     }
+
 }

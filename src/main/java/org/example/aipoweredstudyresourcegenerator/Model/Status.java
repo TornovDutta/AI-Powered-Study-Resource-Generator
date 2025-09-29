@@ -4,15 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class TestRequested {
-    String topic;
-    LocalDate date;
-    LocalTime time;
-
-
+public class Status {
+    private String status;
+    private String message;
 }
