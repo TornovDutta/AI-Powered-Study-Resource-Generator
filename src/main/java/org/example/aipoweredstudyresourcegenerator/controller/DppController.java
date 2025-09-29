@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 @RestController
+@RequestMapping("")
 public class DppController {
     String topic="";
 
@@ -29,11 +30,11 @@ public class DppController {
     @Autowired
     private ThreadPoolTaskScheduler taskScheduler;
 
-    @GetMapping("dppCreate")
+    @GetMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
-    @PostMapping("dppStart")
+    @PostMapping("schedule")
     public ResponseEntity<Status> createDpp(@RequestBody DppRequested requested){
         topic = requested.getTopic();
         LocalDateTime dateTime = LocalDateTime.of(LocalDate.now(), requested.getTime());
@@ -65,7 +66,7 @@ public class DppController {
     }
 
 
-    @DeleteMapping("dppStop")
+    @DeleteMapping("schedule")
     public ResponseEntity<Status> stopDpp(){
         boolean stopped = schedule.cancel(false);
         topic = "";
