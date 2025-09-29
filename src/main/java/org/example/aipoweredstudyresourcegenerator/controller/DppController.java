@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledFuture;
 
 @RestController
-@RequestMapping("")
+@RequestMapping("/dpp")
 public class DppController {
     String topic="";
 
