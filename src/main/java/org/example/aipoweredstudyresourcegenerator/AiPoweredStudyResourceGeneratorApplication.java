@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class AiPoweredStudyResourceGeneratorApplication {
 
     public static void main(String[] args) {
-        System.out.println("Start the project");
+        System.out.println("Start the project ...... ");
         SpringApplication.run(AiPoweredStudyResourceGeneratorApplication.class, args);
     }
 
