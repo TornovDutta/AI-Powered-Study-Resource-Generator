@@ -1,5 +1,6 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
 import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
+import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
@@ -8,11 +9,13 @@ import org.example.aipoweredstudyresourcegenerator.service.DppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 @RestController
 public class DppController {
@@ -21,36 +24,56 @@ public class DppController {
 
     @Autowired
     private DppService service;
+
+    private ScheduledFuture<?> schedule;
     @Autowired
-    private DynamicSchedule dynamicScheduler;
+    private ThreadPoolTaskScheduler taskScheduler;
 
     @GetMapping("dppCreate")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
     }
     @PostMapping("dppStart")
-    public ResponseEntity<String> createDpp(@RequestBody DppRequested requested){
+    public ResponseEntity<Status> createDpp(@RequestBody DppRequested requested){
         topic = requested.getTopic();
         LocalDateTime dateTime = LocalDateTime.of(LocalDate.now(), requested.getTime());
+        Instant firstrun=getFirstRunTime(requested.getTime());
 
-        dynamicScheduler.schedule(() -> {
+        schedule=taskScheduler.scheduleAtFixedRate(
+                ()->{
+                    List<Questions> questions=service.dppGenerator(topic);
+                    service.sendMail(topic,questions);
+                },firstrun, Duration.ofDays(1)
+        );
+        Status status=new Status("scheduled daily", topic);
 
-            List<Questions> questions=service.dppGenerator(topic);
-            service.sendMail(topic,questions);
-        }, dateTime);
 
-        return new ResponseEntity<>("Scheduled successfully", HttpStatus.OK);
+        return new ResponseEntity<>(status, HttpStatus.OK);
+    }
+    private Instant getFirstRunTime(LocalTime time) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime nextRun = now.withHour(time.getHour())
+                .withMinute(time.getMinute())
+                .withSecond(0)
+                .withNano(0);
+
+        if (nextRun.isBefore(now)) {
+            nextRun = nextRun.plusDays(1);
+        }
+
+        return nextRun.atZone(ZoneId.systemDefault()).toInstant();
     }
 
 
     @DeleteMapping("dppStop")
-    public ResponseEntity<String> stopDpp(){
-        boolean stopped = dynamicScheduler.stop();
+    public ResponseEntity<Status> stopDpp(){
+        boolean stopped = schedule.cancel(false);
         topic = "";
         if(stopped) {
-            return new ResponseEntity<>("Scheduler stopped", HttpStatus.OK);
+            Status status=new Status("success","Scheduled DPP stopped successfully");
+            return new ResponseEntity<>(status, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("No active scheduler to stop", HttpStatus.OK);
+            return null;
         }
     }
 }
