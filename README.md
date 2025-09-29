@@ -132,5 +132,5 @@ src/main/java/org/example/aipoweredstudyresourcegenerator
 
 ## 👨‍💻 Author
 **Tornov Dutta**  
-📧 your-email@example.com  
-🌐 [LinkedIn](https://linkedin.com/in/yourprofile) | [GitHub](https://github.com/yourusername)
+📧 tornovdutta@gmail.com 
+🌐 [LinkedIn](https://www.linkedin.com/in/tornov-dutta/) | [GitHub](https://github.com/TornovDutta)
