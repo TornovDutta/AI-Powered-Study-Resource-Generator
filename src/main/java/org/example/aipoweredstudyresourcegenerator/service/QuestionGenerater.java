@@ -11,13 +11,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class QuestionGenerater {
-    @Autowired
-    private OpenAIService service;
-    @Autowired
-    private TopicRepo topicRepository;
+    private final OpenAIService service;
+    private final TopicRepo topicRepository;
+    private final QuestionRepo questionsWrapperRepository;
 
-    @Autowired
-    private QuestionRepo questionsWrapperRepository;
+    public QuestionGenerater(OpenAIService service, TopicRepo topicRepository, QuestionRepo questionsWrapperRepository) {
+        this.service = service;
+        this.topicRepository = topicRepository;
+        this.questionsWrapperRepository = questionsWrapperRepository;
+    }
+
     static final int number=10;
 
     public ResponseEntity<String> generated(String topicName){

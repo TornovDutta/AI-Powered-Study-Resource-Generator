@@ -2,7 +2,6 @@ package org.example.aipoweredstudyresourcegenerator.service;
 
 import org.example.aipoweredstudyresourcegenerator.DAO.NoteRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.Note;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
