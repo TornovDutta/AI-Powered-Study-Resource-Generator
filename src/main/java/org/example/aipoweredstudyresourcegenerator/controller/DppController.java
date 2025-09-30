@@ -1,15 +1,11 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
 import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Status;
-import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
-import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
 
 import org.example.aipoweredstudyresourcegenerator.service.DppService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +19,17 @@ public class DppController {
     String topic="";
 
 
-    @Autowired
-    private DppService service;
+
+    private final DppService service;
 
     private ScheduledFuture<?> schedule;
-    @Autowired
-    private ThreadPoolTaskScheduler taskScheduler;
+
+    private final ThreadPoolTaskScheduler taskScheduler;
+
+    public DppController(DppService service, ThreadPoolTaskScheduler taskScheduler) {
+        this.service = service;
+        this.taskScheduler = taskScheduler;
+    }
 
     @GetMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
