@@ -19,10 +19,15 @@ import java.util.List;
 @RequestMapping("/tests/")
 public class TestController {
     String topic;
-    @Autowired
-    private TestService service;
-    @Autowired
-    private DynamicSchedule dynamicScheduler;
+
+    private final TestService service;
+    private final DynamicSchedule dynamicScheduler;
+
+    public TestController(TestService service, DynamicSchedule dynamicScheduler) {
+        this.service = service;
+        this.dynamicScheduler = dynamicScheduler;
+    }
+
     @PostMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.testGenerator(topic), HttpStatus.OK);
