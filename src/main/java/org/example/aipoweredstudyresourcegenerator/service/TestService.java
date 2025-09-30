@@ -16,18 +16,17 @@ import java.util.List;
 @Service
 public class TestService {
 
-    @Autowired
-    private QuestionGenerater generator;
+    private final QuestionGenerater generator;
+    private final QuestionRepo questionRepo;
+    private final TopicRepo topicRepo;
+    private final JavaMailSender mail;
 
-    @Autowired
-    private QuestionRepo questionRepo;
-
-    @Autowired
-    private TopicRepo topicRepo;
-
-    @Autowired
-    private JavaMailSender mail;
-
+    public TestService(QuestionGenerater generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
+        this.generator = generator;
+        this.questionRepo = questionRepo;
+        this.topicRepo = topicRepo;
+        this.mail = mail;
+    }
 
     public List<Questions> testGenerator(String topicName) {
 
