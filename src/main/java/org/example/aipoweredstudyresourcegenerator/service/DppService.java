@@ -15,18 +15,24 @@ import java.util.List;
 @Service
 public class DppService {
 
-    @Autowired
-    private QuestionGenerater generator;
 
-    @Autowired
-    private QuestionRepo questionRepo;
+    private final  QuestionGenerater generator;
 
-    @Autowired
-    private TopicRepo topicRepo;
 
-    @Autowired
-    private JavaMailSender mail;
+    private final QuestionRepo questionRepo;
 
+
+    private final TopicRepo topicRepo;
+
+
+    private final JavaMailSender mail;
+
+    public DppService(QuestionGenerater generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
+        this.generator = generator;
+        this.questionRepo = questionRepo;
+        this.topicRepo = topicRepo;
+        this.mail = mail;
+    }
 
     public List<Questions> dppGenerator(String topicName) {
 
