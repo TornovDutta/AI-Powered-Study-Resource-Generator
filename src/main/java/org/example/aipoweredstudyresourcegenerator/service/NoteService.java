@@ -11,11 +11,13 @@ import java.util.List;
 
 @Service
 public class NoteService {
-    @Autowired
-    private OpenAIService openAi;
+    private final OpenAIService openAi;
+    private final NoteRepo repo;
 
-    @Autowired
-    private NoteRepo repo;
+    public NoteService(OpenAIService openAi, NoteRepo repo) {
+        this.openAi = openAi;
+        this.repo = repo;
+    }
 
     public ResponseEntity<List<Note>> getNote(String topic) {
         boolean exists = repo.existsByTopic(topic);
