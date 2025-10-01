@@ -1,8 +1,8 @@
 package org.example.aipoweredstudyresourcegenerator.service;
 
+import org.reactivestreams.Publisher;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service

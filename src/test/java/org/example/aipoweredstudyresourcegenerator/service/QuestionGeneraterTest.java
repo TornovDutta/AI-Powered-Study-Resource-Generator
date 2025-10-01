@@ -4,12 +4,10 @@ import org.example.aipoweredstudyresourcegenerator.DAO.QuestionRepo;
 import org.example.aipoweredstudyresourcegenerator.DAO.TopicRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static reactor.core.publisher.Mono.when;
 
 class QuestionGeneraterTest {
     @Mock
@@ -20,6 +18,9 @@ class QuestionGeneraterTest {
     @Mock
     private QuestionRepo questionsWrapperRepository;
 
+    @InjectMocks
+    private QuestionGenerater questionGenerater;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -29,6 +30,7 @@ class QuestionGeneraterTest {
     void generated() {
         String input="java";
         String output="ok";
+//        when(service.getResponse(input)).thenReturn(output);
 
 
 
