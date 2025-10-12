@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class NoteService {
+public class  NoteService{
     private final OpenAIService openAi;
     private final NoteRepo repo;
 
