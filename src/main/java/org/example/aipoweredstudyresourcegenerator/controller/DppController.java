@@ -1,4 +1,5 @@
 package org.example.aipoweredstudyresourcegenerator.controller;
+import lombok.RequiredArgsConstructor;
 import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
@@ -15,6 +16,7 @@ import java.util.concurrent.ScheduledFuture;
 
 @RestController
 @RequestMapping("/dpp")
+@RequiredArgsConstructor
 public class DppController {
     String topic="";
 
@@ -26,10 +28,7 @@ public class DppController {
 
     private final ThreadPoolTaskScheduler taskScheduler;
 
-    public DppController(DppService service, ThreadPoolTaskScheduler taskScheduler) {
-        this.service = service;
-        this.taskScheduler = taskScheduler;
-    }
+
 
     @GetMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
