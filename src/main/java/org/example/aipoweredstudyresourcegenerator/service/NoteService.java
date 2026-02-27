@@ -1,6 +1,6 @@
 package org.example.aipoweredstudyresourcegenerator.service;
 
-import org.example.aipoweredstudyresourcegenerator.DAO.NoteRepo;
+import org.example.aipoweredstudyresourcegenerator.Repo.NoteRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.Note;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

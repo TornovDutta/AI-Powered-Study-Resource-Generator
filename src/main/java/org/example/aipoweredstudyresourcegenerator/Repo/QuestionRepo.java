@@ -1,4 +1,4 @@
-package org.example.aipoweredstudyresourcegenerator.DAO;
+package org.example.aipoweredstudyresourcegenerator.Repo;
 
 import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
 import org.example.aipoweredstudyresourcegenerator.Model.Topic;
