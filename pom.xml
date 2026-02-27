@@ -115,7 +115,7 @@
     </dependencyManagement>
 
     <build>
-        <finalName>Study Resource Generator</finalName>
+        <finalName>StudyResourceGenerator</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
