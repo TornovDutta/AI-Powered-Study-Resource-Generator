@@ -29,7 +29,6 @@ public class DppController {
     private final ThreadPoolTaskScheduler taskScheduler;
 
 
-
     @GetMapping("")
     public ResponseEntity<List<Questions>> create(@RequestBody String topic){
         return new ResponseEntity<>(service.dppGenerator(topic), HttpStatus.OK);
