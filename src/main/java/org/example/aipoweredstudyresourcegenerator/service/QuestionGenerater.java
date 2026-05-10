@@ -1,10 +1,9 @@
 package org.example.aipoweredstudyresourcegenerator.service;
 
-import org.example.aipoweredstudyresourcegenerator.DAO.QuestionRepo;
-import org.example.aipoweredstudyresourcegenerator.DAO.TopicRepo;
+import org.example.aipoweredstudyresourcegenerator.Repo.QuestionRepo;
+import org.example.aipoweredstudyresourcegenerator.Repo.TopicRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
 import org.example.aipoweredstudyresourcegenerator.Model.Topic;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
