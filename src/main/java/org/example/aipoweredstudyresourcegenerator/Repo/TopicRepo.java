@@ -1,12 +1,10 @@
-package org.example.aipoweredstudyresourcegenerator.DAO;
+package org.example.aipoweredstudyresourcegenerator.Repo;
 
-import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
 import org.example.aipoweredstudyresourcegenerator.Model.Topic;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 
-import java.util.List;
 import java.util.Optional;
 
 

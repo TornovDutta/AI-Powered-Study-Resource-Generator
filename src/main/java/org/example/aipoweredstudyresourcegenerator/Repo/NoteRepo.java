@@ -1,4 +1,4 @@
-package org.example.aipoweredstudyresourcegenerator.DAO;
+package org.example.aipoweredstudyresourcegenerator.Repo;
 
 import org.example.aipoweredstudyresourcegenerator.Model.Note;
 import org.springframework.data.jpa.repository.JpaRepository;
