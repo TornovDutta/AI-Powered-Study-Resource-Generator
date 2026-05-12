@@ -21,8 +21,14 @@ public class NoteController {
     }
 
     @GetMapping("")
-    @Operation(summary = "Get notes for a topic", description = "Returns existing notes or generates new ones via NVIDIA AI")
+    @Operation(summary = "Get notes for a topic", description = "Returns existing notes or generates new ones via NVIDIA AI. Checks Pinecone for semantically similar notes before generating.")
     public ResponseEntity<List<Note>> createNote(@RequestParam String topic) {
         return service.getNote(topic);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Semantic search across all notes", description = "Uses Pinecone vector search to find notes semantically related to your query, even if they don't share exact keywords.")
+    public ResponseEntity<List<Note>> searchNotes(@RequestParam String query) {
+        return service.searchNotes(query);
     }
 }
