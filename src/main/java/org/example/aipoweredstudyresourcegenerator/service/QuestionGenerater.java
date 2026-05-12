@@ -8,21 +8,31 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class QuestionGenerater {
+
     private final OpenAIService service;
     private final TopicRepo topicRepository;
     private final QuestionRepo questionsWrapperRepository;
+    private final EmbeddingService embeddingService;
+    private final PineconeService pineconeService;
 
-    public QuestionGenerater(OpenAIService service, TopicRepo topicRepository, QuestionRepo questionsWrapperRepository) {
+    static final int number = 10;
+
+    public QuestionGenerater(OpenAIService service, TopicRepo topicRepository,
+                             QuestionRepo questionsWrapperRepository,
+                             EmbeddingService embeddingService, PineconeService pineconeService) {
         this.service = service;
         this.topicRepository = topicRepository;
         this.questionsWrapperRepository = questionsWrapperRepository;
+        this.embeddingService = embeddingService;
+        this.pineconeService = pineconeService;
     }
 
-    static final int number=10;
-
-    public ResponseEntity<String> generated(String topicName){
+    public ResponseEntity<String> generated(String topicName) {
         String prompt = "Generate " + number + " multiple choice questions (MCQs) on the topic: "
                 + topicName + ".\n"
                 + "Strictly use the following format for each question:\n\n"
@@ -34,12 +44,11 @@ public class QuestionGenerater {
                 + "Answer: <correct option letter>\n\n"
                 + "Do not include explanations, only follow this exact format for each question.";
 
-
         String response = service.getResponse(prompt);
+
         Topic topic = new Topic();
         topic.setName(topicName);
         topicRepository.save(topic);
-
 
         String[] questionsArray = response.split("Question:");
         for (String qBlock : questionsArray) {
@@ -47,7 +56,6 @@ public class QuestionGenerater {
 
             String[] lines = qBlock.trim().split("\n");
             QuestionsWrapper q = new QuestionsWrapper();
-
             q.setQuestion(lines[0].trim());
 
             for (String line : lines) {
@@ -59,9 +67,24 @@ public class QuestionGenerater {
             }
 
             q.setTopic(topic);
-            questionsWrapperRepository.save(q);
-        }
-        return new ResponseEntity<>("Ok", HttpStatus.OK);
+            QuestionsWrapper saved = questionsWrapperRepository.save(q);
 
+            // Index question in Pinecone to build a searchable question bank
+            List<Float> embedding = embeddingService.embed(topicName + " " + saved.getQuestion());
+            pineconeService.upsert(
+                "question-" + saved.getId(),
+                embedding,
+                Map.of("type", "question", "topic", topicName, "questionId", String.valueOf(saved.getId()))
+            );
+        }
+
+        return new ResponseEntity<>("Ok", HttpStatus.OK);
+    }
+
+    public List<PineconeService.QueryMatch> findSimilarQuestions(String query, int topK) {
+        List<Float> embedding = embeddingService.embed(query);
+        return pineconeService.query(embedding, topK).stream()
+            .filter(m -> "question".equals(m.metadata().get("type")))
+            .toList();
     }
 }
