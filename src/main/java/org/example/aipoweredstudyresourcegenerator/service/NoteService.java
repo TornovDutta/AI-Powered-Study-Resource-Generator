@@ -19,7 +19,7 @@ public class NoteService {
     private final PineconeService pineconeService;
 
     // If Pinecone returns a match above this score, treat it as the same topic
-    private static final float SIMILARITY_THRESHOLD = 0.85f;
+    private static final float SIMILARITY_THRESHOLD = 0.75f;
 
     public NoteService(OpenAIService openAi, NoteRepo repo,
                        EmbeddingService embeddingService, PineconeService pineconeService) {

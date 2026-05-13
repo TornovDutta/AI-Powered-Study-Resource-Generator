@@ -21,7 +21,7 @@ public class EmbeddingService {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String EMBEDDING_URL = "https://integrate.api.nvidia.com/v1/embeddings";
-    private static final String EMBEDDING_MODEL = "nvidia/nv-embed-v1";
+    private static final String EMBEDDING_MODEL = "nvidia/nv-embedqa-e5-v5";
 
     public List<Float> embed(String text) {
         HttpHeaders headers = new HttpHeaders();
