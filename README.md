@@ -1,64 +1,72 @@
-# AI-Powered Study Resource Generator
+# AI-Powered Study Resource Generator (Gen AI)
 
-A backend that generates study notes, MCQ tests, and daily practice papers on demand — then remembers everything it creates so it never does the same work twice.
+A highly scalable, production-ready backend system that leverages Generative AI to dynamically generate study notes, MCQ tests, and daily practice papers. Designed with performance and cost-optimization in mind, this system uses advanced Retrieval-Augmented Generation (RAG) concepts and semantic caching to ensure it never processes the same query twice.
 
 ---
 
-## The core idea
+## Key System Design Principles
 
-Most AI study tools hit the LLM every time you ask a question. This one doesn't.
+This project was built with enterprise-level system design patterns to handle high traffic and provide a seamless user experience:
 
-Every note and every question generated gets embedded and stored in Pinecone. The next time someone asks for something semantically close — even with completely different words — the system finds it without touching the AI. Only genuinely new content triggers a generation call.
+- **Scalability**: Designed to scale horizontally. The stateless Spring Boot backend can be replicated across multiple instances behind a load balancer, while Pinecone and PostgreSQL handle data scaling effortlessly.
+- **High Availability**: The architecture ensures high uptime by decoupling the heavy AI generation tasks from the core retrieval logic. Even if the LLM provider experiences latency, cached semantic hits are served instantly.
+- **Data Consistency**: Relies on strict ACID properties of PostgreSQL for user data and scheduling logic, while maintaining eventual consistency with the Pinecone Vector Database to ensure the semantic search index stays up-to-date with the primary data store.
+- **Cost-Optimization (Semantic Caching)**: Instead of hitting the LLM for every request (which is costly and slow), the system embeds user queries and checks the vector database for a semantic match (cosine similarity ≥ 0.85). Only genuinely new content triggers a Gen AI generation call, drastically reducing API costs and response times.
 
-```
-User request
+---
+
+## Generative AI & RAG Architecture
+
+Most AI study tools naively pass every user prompt to an LLM. This system employs an intelligent semantic caching layer:
+
+```text
+User Request
      │
      ▼
-Exact match in PostgreSQL? ──── YES ──► Return it (fast path)
+[ PostgreSQL ] Exact match? ──── YES ──► Return it (O(1) fast path)
      │
      NO
      │
      ▼
-Embed the query via NVIDIA nv-embed-v1
+[ NVIDIA nv-embed-v1 ] Embed the query into a 4096-dimensional vector
      │
      ▼
-Query Pinecone (cosine similarity)
+[ Pinecone ] Query Vector DB (Cosine Similarity)
      │
-     ├── Score ≥ 0.85 ──► Return existing note from PostgreSQL
+     ├── Score ≥ 0.85 ──► Cache Hit: Return existing note from DB
      │
-     └── No match ──► Generate via NVIDIA LLaMA 3.1
-                           │
-                           ├── Save to PostgreSQL
-                           └── Index in Pinecone (for next time)
+     └── No match ────► Cache Miss: Generate via NVIDIA LLaMA 3.1
+                            │
+                            ├── Save payload to PostgreSQL
+                            └── Index vector in Pinecone asynchronously
 ```
 
 ---
 
-## What it generates
+## Core Features
 
-**Notes** — detailed study notes for any topic. Returned instantly if a semantically similar topic was ever requested before.
-
-**Tests** — 10 MCQs with four options and an answer key. Can be scheduled to arrive in your inbox at a specific date and time.
-
-**Daily Practice Papers (DPPs)** — same format as tests, but scheduled to repeat daily at a fixed time. Good for building streaks.
-
-**Semantic search** — ask a natural language question and get back the most relevant notes from everything ever generated, ranked by meaning not keywords.
+- **Dynamic Notes Generation**: On-demand, detailed study materials powered by state-of-the-art Gen AI models.
+- **Automated Assessments (Tests & DPPs)**: Generates 10-question MCQs with answers. Supports Daily Practice Papers (DPPs) for spaced repetition and streak building.
+- **Asynchronous Task Scheduling**: Users can schedule tests and DPPs to arrive in their inbox at specific times via email integrations.
+- **Semantic Search Engine**: Ask a natural language question and retrieve the most relevant notes from the global database, ranked by semantic meaning rather than basic keyword matching.
+- **Secure Authentication**: Robust session management using GitHub OAuth2.
 
 ---
 
-## Architecture
+## System Architecture
 
-```
+```text
                         ┌─────────────────────────┐
-                        │      Spring Boot API      │
-                        │  (Java 17, Spring AI 1.0) │
+                        │      Spring Boot API    │
+                        │  (Java 17, Spring AI)   │
                         └────────────┬────────────┘
                                      │
                ┌─────────────────────┼─────────────────────┐
                │                     │                     │
                ▼                     ▼                     ▼
     ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-    │   NVIDIA NIM      │  │    PostgreSQL     │  │    Pinecone      │
+    │   NVIDIA NIM     │  │    PostgreSQL    │  │    Pinecone      │
+    │   (Gen AI Layer) │  │   (Primary DB)   │  │   (Vector DB)    │
     │                  │  │                  │  │                  │
     │  LLaMA 3.1 8B    │  │  Notes, Topics,  │  │  Vector index    │
     │  (generation)    │  │  Questions,      │  │  (semantic       │
@@ -68,115 +76,89 @@ Query Pinecone (cosine similarity)
     └──────────────────┘  └──────────────────┘  └──────────────────┘
 ```
 
-Auth is handled through GitHub OAuth2. All endpoints except health check and Swagger require a valid session.
+---
+
+## Tech Stack
+
+- **Backend Framework**: Spring Boot 3.5 (Java 17, JPA, Spring Security, Scheduling)
+- **Generative AI Integration**: Spring AI 1.0, NVIDIA NIM (LLaMA 3.1 8B, nv-embed-v1)
+- **Databases**: PostgreSQL (Relational), Pinecone (Serverless Vector DB)
+- **Authentication**: OAuth 2.0 (GitHub)
+- **Infrastructure / DevOps**: Docker, Docker Compose
 
 ---
 
-## API
+## API Reference (RESTful)
 
-All routes are prefixed with `/api/v1`.
+All routes are prefixed with `/api/v1` and require GitHub OAuth2 authentication (except health checks).
 
 ### Notes
-
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/note?topic=` | Get or generate a note for a topic |
+| `GET` | `/note?topic=` | Get or generate a note for a topic (Semantic Cache first) |
 | `GET` | `/note/search?query=` | Semantic search across all generated notes |
 
-The `GET /note` endpoint checks PostgreSQL first (exact match), then Pinecone (semantic match above 0.85 cosine similarity), and only calls the LLM if nothing close exists.
-
-### Tests
-
+### Tests & DPPs
 | Method | Path | Body | Description |
 |--------|------|------|-------------|
 | `POST` | `/tests/` | `{ "topic": "..." }` | Generate a test immediately |
-| `POST` | `/tests/schedule` | `{ "topic": "...", "date": "YYYY-MM-DD", "time": "HH:MM" }` | Schedule a one-time test via email |
-| `DELETE` | `/tests/schedule` | — | Cancel the scheduled test |
-
-### Daily Practice Papers
-
-| Method | Path | Body | Description |
-|--------|------|------|-------------|
+| `POST` | `/tests/schedule` | `{ "topic": "...", "date": "...", "time": "..." }` | Schedule a one-time test via email |
 | `GET` | `/dpp?topic=` | — | Generate a DPP immediately |
 | `POST` | `/dpp/schedule` | `{ "topic": "...", "time": "HH:MM" }` | Schedule a recurring daily DPP |
-| `DELETE` | `/dpp/schedule` | — | Cancel the scheduled DPP |
-
-### Other
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/auth/me` | Current authenticated user |
-| `GET` | `/` | Health check |
-
-Swagger UI is available at `/api/v1/swagger-ui.html` without authentication.
+| `DELETE` | `/tests/schedule` | — | Cancel scheduled test or DPP |
 
 ---
 
-## Environment variables
+## Setup & Installation
 
-Copy these into a `.env` file at the project root.
+### 1. Environment Variables
+Create a `.env` file at the root:
 
 ```env
-# AI (NVIDIA NIM)
+# Gen AI (NVIDIA NIM)
 NVIDIA_API_KEY=
 
-# Database
+# Primary Database
 DB_URL=jdbc:postgresql://localhost:5432/studydb
 DB_USERNAME=
 DB_PASSWORD=
 
-# Pinecone
+# Vector Database (Pinecone)
 PINECONE_API_KEY=
 PINECONE_INDEX_HOST=https://your-index.svc.us-east-1.pinecone.io
 
-# Mail (Gmail SMTP)
+# SMTP Mail Server
 MAIL_USERNAME=
 MAIL_PASSWORD=
 
-# GitHub OAuth2
+# OAuth2 Authentication
 GITHUB_CLIENT_ID=
 GITHUB_CLIENT_SECRET=
 
-# CORS
+# Security
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
----
+### 2. Vector DB Setup (Pinecone)
+1. Register at [Pinecone](https://pinecone.io).
+2. Create a serverless index: **Dimensions:** `4096`, **Metric:** `cosine`.
+3. Add the API key and Host URL to your `.env`.
 
-## Pinecone setup
-
-1. Create an account at [pinecone.io](https://pinecone.io)
-2. Create a new serverless index with these settings:
-   - **Dimensions:** `4096`
-   - **Metric:** `cosine`
-   - **Cloud / Region:** any (e.g. AWS us-east-1)
-3. Copy the **API key** from the sidebar and the **Host URL** from the index detail page into your `.env`
-
-The index starts empty. It fills up automatically as notes and questions are generated.
-
----
-
-## Running locally
+### 3. Run the Application
+Ensure you have Docker and Java 17 installed.
 
 ```bash
 git clone https://github.com/TornovDutta/AI-Powered-Study-Resource-Generator.git
 cd AI-Powered-Study-Resource-Generator
+
+# (Optional) Run Postgres via Docker Compose
+# docker-compose up -d
+
 mvn spring-boot:run
 ```
-
-The app starts on `http://localhost:8080/api/v1`.
-
----
-
-## Tech used
-
-- **Spring Boot 3.5** — web, JPA, scheduling, mail, security
-- **Spring AI 1.0** — OpenAI-compatible client (pointed at NVIDIA NIM)
-- **NVIDIA NIM** — LLaMA 3.1 8B for generation, nv-embed-v1 for embeddings
-- **Pinecone** — serverless vector database for semantic search and deduplication
-- **PostgreSQL** — primary data store for all generated content and users
-- **GitHub OAuth2** — authentication
+The server will start on `http://localhost:8080/api/v1`.
+Access the Swagger UI at `http://localhost:8080/api/v1/swagger-ui.html`.
 
 ---
 
-Built by [Tornov Dutta](https://github.com/TornovDutta)
+Built by [Tornov Dutta](https://github.com/TornovDutta) - Passionate about building scalable Backend Systems and Generative AI applications.
