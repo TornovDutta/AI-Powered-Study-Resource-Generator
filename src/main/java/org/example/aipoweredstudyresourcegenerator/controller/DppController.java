@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.aipoweredstudyresourcegenerator.Model.DppRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
-import org.example.aipoweredstudyresourcegenerator.service.DppService;
+import org.example.aipoweredstudyresourcegenerator.service.PracticePaperService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -23,7 +23,7 @@ import java.util.concurrent.ScheduledFuture;
 public class DppController {
     String topic = "";
 
-    private final DppService service;
+    private final PracticePaperService service;
     private ScheduledFuture<?> schedule;
     private final ThreadPoolTaskScheduler taskScheduler;
 

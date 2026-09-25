@@ -1,7 +1,7 @@
 package org.example.aipoweredstudyresourcegenerator.service.impl;
 import org.example.aipoweredstudyresourcegenerator.service.*;
 
-import org.example.aipoweredstudyresourcegenerator.service.TestService;
+import org.example.aipoweredstudyresourcegenerator.service.MockTestService;
 import org.example.aipoweredstudyresourcegenerator.Repo.QuestionRepo;
 import org.example.aipoweredstudyresourcegenerator.Repo.TopicRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
@@ -15,14 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class TestServiceImpl implements TestService {
+public class MockTestServiceImpl implements MockTestService {
 
-    private final QuestionGenerater generator;
+    private final QuestionGeneratorService generator;
     private final QuestionRepo questionRepo;
     private final TopicRepo topicRepo;
     private final JavaMailSender mail;
 
-    public TestServiceImpl(QuestionGenerater generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
+    public MockTestServiceImpl(QuestionGeneratorService generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
         this.generator = generator;
         this.questionRepo = questionRepo;
         this.topicRepo = topicRepo;

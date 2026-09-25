@@ -1,7 +1,7 @@
 package org.example.aipoweredstudyresourcegenerator.service.impl;
 import org.example.aipoweredstudyresourcegenerator.service.*;
 
-import org.example.aipoweredstudyresourcegenerator.service.QuestionGenerater;
+import org.example.aipoweredstudyresourcegenerator.service.QuestionGeneratorService;
 import org.example.aipoweredstudyresourcegenerator.Repo.QuestionRepo;
 import org.example.aipoweredstudyresourcegenerator.Repo.TopicRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.QuestionsWrapper;
@@ -14,24 +14,24 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class QuestionGeneraterImpl implements QuestionGenerater {
+public class QuestionGeneratorServiceImpl implements QuestionGeneratorService {
 
-    private final OpenAIService service;
+    private final AiChatService service;
     private final TopicRepo topicRepository;
     private final QuestionRepo questionsWrapperRepository;
     private final EmbeddingService embeddingService;
-    private final PineconeService pineconeService;
+    private final VectorDatabaseService vectorDatabaseService;
 
     static final int number = 10;
 
-    public QuestionGeneraterImpl(OpenAIService service, TopicRepo topicRepository,
+    public QuestionGeneratorServiceImpl(AiChatService service, TopicRepo topicRepository,
                              QuestionRepo questionsWrapperRepository,
-                             EmbeddingService embeddingService, PineconeService pineconeService) {
+                             EmbeddingService embeddingService, VectorDatabaseService vectorDatabaseService) {
         this.service = service;
         this.topicRepository = topicRepository;
         this.questionsWrapperRepository = questionsWrapperRepository;
         this.embeddingService = embeddingService;
-        this.pineconeService = pineconeService;
+        this.vectorDatabaseService = vectorDatabaseService;
     }
 
     public ResponseEntity<String> generated(String topicName) {
@@ -73,7 +73,7 @@ public class QuestionGeneraterImpl implements QuestionGenerater {
 
             // Index question in Pinecone to build a searchable question bank
             List<Float> embedding = embeddingService.embed(topicName + " " + saved.getQuestion());
-            pineconeService.upsert(
+            vectorDatabaseService.upsert(
                 "question-" + saved.getId(),
                 embedding,
                 Map.of("type", "question", "topic", topicName, "questionId", String.valueOf(saved.getId()))
@@ -83,9 +83,9 @@ public class QuestionGeneraterImpl implements QuestionGenerater {
         return new ResponseEntity<>("Ok", HttpStatus.OK);
     }
 
-    public List<PineconeService.QueryMatch> findSimilarQuestions(String query, int topK) {
+    public List<VectorDatabaseService.QueryMatch> findSimilarQuestions(String query, int topK) {
         List<Float> embedding = embeddingService.embed(query);
-        return pineconeService.query(embedding, topK).stream()
+        return vectorDatabaseService.query(embedding, topK).stream()
             .filter(m -> "question".equals(m.metadata().get("type")))
             .toList();
     }

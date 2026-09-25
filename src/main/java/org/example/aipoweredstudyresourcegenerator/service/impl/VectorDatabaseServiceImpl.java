@@ -1,7 +1,7 @@
 package org.example.aipoweredstudyresourcegenerator.service.impl;
 import org.example.aipoweredstudyresourcegenerator.service.*;
 
-import org.example.aipoweredstudyresourcegenerator.service.PineconeService;
+import org.example.aipoweredstudyresourcegenerator.service.VectorDatabaseService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
-public class PineconeServiceImpl implements PineconeService {
+public class VectorDatabaseServiceImpl implements VectorDatabaseService {
 
     @Value("${pinecone.api-key}")
     private String apiKey;
@@ -23,7 +23,7 @@ public class PineconeServiceImpl implements PineconeService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    public PineconeServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public VectorDatabaseServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }

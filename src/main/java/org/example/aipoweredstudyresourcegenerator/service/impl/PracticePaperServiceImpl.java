@@ -1,7 +1,7 @@
 package org.example.aipoweredstudyresourcegenerator.service.impl;
 import org.example.aipoweredstudyresourcegenerator.service.*;
 
-import org.example.aipoweredstudyresourcegenerator.service.DppService;
+import org.example.aipoweredstudyresourcegenerator.service.PracticePaperService;
 import org.example.aipoweredstudyresourcegenerator.Repo.QuestionRepo;
 import org.example.aipoweredstudyresourcegenerator.Repo.TopicRepo;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class DppServiceImpl implements DppService {
+public class PracticePaperServiceImpl implements PracticePaperService {
 
 
-    private final  QuestionGenerater generator;
+    private final  QuestionGeneratorService generator;
 
 
     private final QuestionRepo questionRepo;
@@ -28,7 +28,7 @@ public class DppServiceImpl implements DppService {
 
     private final JavaMailSender mail;
 
-    public DppServiceImpl(QuestionGenerater generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
+    public PracticePaperServiceImpl(QuestionGeneratorService generator, QuestionRepo questionRepo, TopicRepo topicRepo, JavaMailSender mail) {
         this.generator = generator;
         this.questionRepo = questionRepo;
         this.topicRepo = topicRepo;

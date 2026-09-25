@@ -15,20 +15,20 @@ import java.util.Optional;
 @Service
 public class NoteServiceImpl implements NoteService {
 
-    private final OpenAIService openAi;
+    private final AiChatService openAi;
     private final NoteRepo repo;
     private final EmbeddingService embeddingService;
-    private final PineconeService pineconeService;
+    private final VectorDatabaseService vectorDatabaseService;
 
     // If Pinecone returns a match above this score, treat it as the same topic
     private static final float SIMILARITY_THRESHOLD = 0.75f;
 
-    public NoteServiceImpl(OpenAIService openAi, NoteRepo repo,
-                       EmbeddingService embeddingService, PineconeService pineconeService) {
+    public NoteServiceImpl(AiChatService openAi, NoteRepo repo,
+                       EmbeddingService embeddingService, VectorDatabaseService vectorDatabaseService) {
         this.openAi = openAi;
         this.repo = repo;
         this.embeddingService = embeddingService;
-        this.pineconeService = pineconeService;
+        this.vectorDatabaseService = vectorDatabaseService;
     }
 
     public ResponseEntity<List<Note>> getNote(String topic) {
@@ -39,9 +39,9 @@ public class NoteServiceImpl implements NoteService {
 
         // 2. Semantic match in Pinecone â€” avoids regenerating nearly identical notes
         List<Float> queryEmbedding = embeddingService.embed(topic);
-        List<PineconeService.QueryMatch> matches = pineconeService.query(queryEmbedding, 3);
+        List<VectorDatabaseService.QueryMatch> matches = vectorDatabaseService.query(queryEmbedding, 3);
 
-        Optional<PineconeService.QueryMatch> semanticMatch = matches.stream()
+        Optional<VectorDatabaseService.QueryMatch> semanticMatch = matches.stream()
             .filter(m -> "note".equals(m.metadata().get("type")) && m.score() >= SIMILARITY_THRESHOLD)
             .findFirst();
 
@@ -65,7 +65,7 @@ public class NoteServiceImpl implements NoteService {
         // Embed a summary of the content for richer semantic matching
         String embeddingInput = topic + " " + noteContent.substring(0, Math.min(500, noteContent.length()));
         List<Float> noteEmbedding = embeddingService.embed(embeddingInput);
-        pineconeService.upsert(
+        vectorDatabaseService.upsert(
             "note-" + saved.getId(),
             noteEmbedding,
             Map.of("type", "note", "topic", topic, "noteId", String.valueOf(saved.getId()))
@@ -76,7 +76,7 @@ public class NoteServiceImpl implements NoteService {
 
     public ResponseEntity<List<Note>> searchNotes(String query) {
         List<Float> queryEmbedding = embeddingService.embed(query);
-        List<PineconeService.QueryMatch> matches = pineconeService.query(queryEmbedding, 5);
+        List<VectorDatabaseService.QueryMatch> matches = vectorDatabaseService.query(queryEmbedding, 5);
 
         List<Note> results = matches.stream()
             .filter(m -> "note".equals(m.metadata().get("type")))

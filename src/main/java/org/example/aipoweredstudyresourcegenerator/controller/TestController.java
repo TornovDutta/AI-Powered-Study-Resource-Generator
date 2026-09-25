@@ -6,7 +6,7 @@ import org.example.aipoweredstudyresourcegenerator.Model.Status;
 import org.example.aipoweredstudyresourcegenerator.Model.TestRequested;
 import org.example.aipoweredstudyresourcegenerator.Model.Questions;
 import org.example.aipoweredstudyresourcegenerator.config.DynamicSchedule;
-import org.example.aipoweredstudyresourcegenerator.service.TestService;
+import org.example.aipoweredstudyresourcegenerator.service.MockTestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,10 +20,10 @@ import java.util.List;
 public class TestController {
     String topic;
 
-    private final TestService service;
+    private final MockTestService service;
     private final DynamicSchedule dynamicScheduler;
 
-    public TestController(TestService service, DynamicSchedule dynamicScheduler) {
+    public TestController(MockTestService service, DynamicSchedule dynamicScheduler) {
         this.service = service;
         this.dynamicScheduler = dynamicScheduler;
     }

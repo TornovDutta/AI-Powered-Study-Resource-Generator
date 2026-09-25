@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-public interface TestService {
-    List<Questions> testGenerator(String topicName);
-    void sendMail(String topic, List<Questions> questionsList);
+public interface PracticePaperService {
+    List<Questions> dppGenerator(String topicName);
+    void sendMail(String topic,List<Questions> question);
 }
