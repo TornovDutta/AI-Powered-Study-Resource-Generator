@@ -20,8 +20,8 @@ public class EmbeddingService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String EMBEDDING_URL = "https://integrate.api.nvidia.com/v1/embeddings";
-    private static final String EMBEDDING_MODEL = "nvidia/nv-embedqa-e5-v5";
+    private static final String EMBEDDING_URL = "https://api-inference.huggingface.co/v1/embeddings";
+    private static final String EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2";
 
     public List<Float> embed(String text) {
         HttpHeaders headers = new HttpHeaders();
@@ -29,11 +29,8 @@ public class EmbeddingService {
         headers.setBearerAuth(apiKey);
 
         Map<String, Object> body = Map.of(
-            "input", List.of(text),
-            "model", EMBEDDING_MODEL,
-            "encoding_format", "float",
-            "input_type", "query",
-            "truncate", "END"
+            "input", text,
+            "model", EMBEDDING_MODEL
         );
 
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
