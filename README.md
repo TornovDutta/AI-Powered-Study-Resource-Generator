@@ -8,9 +8,9 @@ A highly scalable, production-ready backend system that leverages Generative AI 
 
 This project was built with enterprise-level system design patterns to handle high traffic and provide a seamless user experience:
 
-- **Scalability**: Designed to scale horizontally. The stateless Spring Boot backend can be replicated across multiple instances behind a load balancer, while Pinecone and PostgreSQL handle data scaling effortlessly.
+- **Scalability**: Designed to scale horizontally. The stateless Spring Boot backend can be replicated across multiple instances behind a load balancer, while PostgreSQL with pgvector handles both relational data and vector scaling effortlessly.
 - **High Availability**: The architecture ensures high uptime by decoupling the heavy AI generation tasks from the core retrieval logic. Even if the LLM provider experiences latency, cached semantic hits are served instantly.
-- **Data Consistency**: Relies on strict ACID properties of PostgreSQL for user data and scheduling logic, while maintaining eventual consistency with the Pinecone Vector Database to ensure the semantic search index stays up-to-date with the primary data store.
+- **Data Consistency**: Relies on strict ACID properties of PostgreSQL for user data and scheduling logic, maintaining seamless consistency with the pgvector extension to ensure the semantic search index stays in sync with the primary data store.
 - **Cost-Optimization (Semantic Caching)**: Instead of hitting the LLM for every request (which is costly and slow), the system embeds user queries and checks the vector database for a semantic match (cosine similarity ≥ 0.85). Only genuinely new content triggers a Gen AI generation call, drastically reducing API costs and response times.
 
 ---
@@ -28,17 +28,17 @@ User Request
      NO
      │
      ▼
-[ NVIDIA nv-embed-v1 ] Embed the query into a 4096-dimensional vector
+[ Hugging Face (all-MiniLM-L6-v2) ] Embed the query into a 384-dimensional vector
      │
      ▼
-[ Pinecone ] Query Vector DB (Cosine Similarity)
+[ pgvector ] Query Vector DB (Cosine Similarity)
      │
-     ├── Score ≥ 0.85 ──► Cache Hit: Return existing note from DB
+     ├── Score ≥ 0.75 ──► Cache Hit: Return existing note from DB
      │
-     └── No match ────► Cache Miss: Generate via NVIDIA LLaMA 3.1
+     └── No match ────► Cache Miss: Generate via Hugging Face LLM
                             │
                             ├── Save payload to PostgreSQL
-                            └── Index vector in Pinecone asynchronously
+                            └── Index vector in pgvector
 ```
 
 ---
@@ -62,18 +62,18 @@ User Request
                         └────────────┬────────────┘
                                      │
                ┌─────────────────────┼─────────────────────┐
-               │                     │                     │
-               ▼                     ▼                     ▼
-    ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-    │   NVIDIA NIM     │  │    PostgreSQL    │  │    Pinecone      │
-    │   (Gen AI Layer) │  │   (Primary DB)   │  │   (Vector DB)    │
-    │                  │  │                  │  │                  │
-    │  LLaMA 3.1 8B    │  │  Notes, Topics,  │  │  Vector index    │
-    │  (generation)    │  │  Questions,      │  │  (semantic       │
-    │                  │  │  Users           │  │   search)        │
-    │  nv-embed-v1     │  │                  │  │                  │
-    │  (embeddings)    │  │                  │  │  4096-dim cosine │
-    └──────────────────┘  └──────────────────┘  └──────────────────┘
+               │                                           │
+               ▼                                           ▼
+    ┌──────────────────┐                  ┌────────────────────────────────┐
+    │   Hugging Face   │                  │           PostgreSQL           │
+    │  (Gen AI Layer)  │                  │          (Primary DB)          │
+    │                  │                  │                                │
+    │  Qwen / LLaMA    │                  │  Notes, Topics, Questions      │
+    │  (generation)    │                  │                                │
+    │                  │                  │       [ pgvector ext ]         │
+    │  all-MiniLM-L6-v2│                  │  Vector index (semantic search)│
+    │  (embeddings)    │                  │  384-dim cosine distance       │
+    └──────────────────┘                  └────────────────────────────────┘
 ```
 
 ---
@@ -81,8 +81,8 @@ User Request
 ## Tech Stack
 
 - **Backend Framework**: Spring Boot 3.5 (Java 17, JPA, Spring Security, Scheduling)
-- **Generative AI Integration**: Spring AI 1.0, NVIDIA NIM (LLaMA 3.1 8B, nv-embed-v1)
-- **Databases**: PostgreSQL (Relational), Pinecone (Serverless Vector DB)
+- **Generative AI Integration**: Spring AI 1.0, Hugging Face (Qwen / LLaMA, all-MiniLM-L6-v2)
+- **Databases**: PostgreSQL (Relational) with `pgvector` extension for Semantic Search
 - **Authentication**: OAuth 2.0 (GitHub)
 - **Infrastructure / DevOps**: Docker, Docker Compose
 
@@ -115,17 +115,14 @@ All routes are prefixed with `/api/v1` and require GitHub OAuth2 authentication 
 Create a `.env` file at the root:
 
 ```env
-# Gen AI (NVIDIA NIM)
-NVIDIA_API_KEY=
+# Gen AI (Hugging Face)
+HF_MODEL=Qwen/Qwen2.5-72B-Instruct
+HF_TOKEN=
 
-# Primary Database
+# Primary Database (used if running outside of Docker Compose)
 DB_URL=jdbc:postgresql://localhost:5432/studydb
-DB_USERNAME=
-DB_PASSWORD=
-
-# Vector Database (Pinecone)
-PINECONE_API_KEY=
-PINECONE_INDEX_HOST=https://your-index.svc.us-east-1.pinecone.io
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
 
 # SMTP Mail Server
 MAIL_USERNAME=
@@ -139,23 +136,31 @@ GITHUB_CLIENT_SECRET=
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-### 2. Vector DB Setup (Pinecone)
-1. Register at [Pinecone](https://pinecone.io).
-2. Create a serverless index: **Dimensions:** `4096`, **Metric:** `cosine`.
-3. Add the API key and Host URL to your `.env`.
-
-### 3. Run the Application
-Ensure you have Docker and Java 17 installed.
+### 2. Run the Application with Docker Compose
+The easiest way to start the system, including the PostgreSQL database with `pgvector` and the Spring Boot application, is using Docker Compose. Ensure you have Docker installed.
 
 ```bash
 git clone https://github.com/TornovDutta/AI-Powered-Study-Resource-Generator.git
 cd AI-Powered-Study-Resource-Generator
 
-# (Optional) Run Postgres via Docker Compose
-# docker-compose up -d
+# Package the application
+./mvnw clean package -DskipTests
 
-mvn spring-boot:run
+# Run the complete stack (app + database)
+docker-compose up --build -d
 ```
+
+### 3. Alternative: Run locally (IDE)
+If you prefer to run the application from your IDE (e.g., IntelliJ IDEA), you can start just the database using Docker Compose, or have your own PostgreSQL instance with the `pgvector` extension installed.
+
+```bash
+# Start only the database container
+docker-compose up db -d
+
+# Run the Spring Boot app locally
+./mvnw spring-boot:run
+```
+
 The server will start on `http://localhost:8080/api/v1`.
 Access the Swagger UI at `http://localhost:8080/api/v1/swagger-ui.html`.
 

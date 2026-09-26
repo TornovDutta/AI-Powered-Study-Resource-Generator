@@ -27,25 +27,21 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         this.objectMapper = objectMapper;
     }
 
-    private static final String EMBEDDING_URL = "https://api-inference.huggingface.co/v1/embeddings";
-    private static final String EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2";
+    private static final String EMBEDDING_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2";
 
     public List<Float> embed(String text) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(apiKey);
 
-        Map<String, Object> body = Map.of(
-            "input", text,
-            "model", EMBEDDING_MODEL
-        );
-
+        Map<String, Object> body = Map.of("inputs", text);
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
         ResponseEntity<String> response = restTemplate.exchange(EMBEDDING_URL, HttpMethod.POST, request, String.class);
 
         try {
             JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode embeddingArray = root.get("data").get(0).get("embedding");
+            JsonNode embeddingArray = getFirstNumberArray(root);
+            
             List<Float> embedding = new ArrayList<>();
             for (JsonNode val : embeddingArray) {
                 embedding.add(val.floatValue());
@@ -54,6 +50,16 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse embedding response", e);
         }
+    }
+
+    private JsonNode getFirstNumberArray(JsonNode node) {
+        if (node.isArray() && node.size() > 0) {
+            if (node.get(0).isNumber()) {
+                return node;
+            }
+            return getFirstNumberArray(node.get(0));
+        }
+        return node;
     }
 }
 
