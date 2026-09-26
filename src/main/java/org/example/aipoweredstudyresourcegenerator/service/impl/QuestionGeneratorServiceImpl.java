@@ -71,7 +71,7 @@ public class QuestionGeneratorServiceImpl implements QuestionGeneratorService {
             q.setTopic(topic);
             QuestionsWrapper saved = questionsWrapperRepository.save(q);
 
-            // Index question in Pinecone to build a searchable question bank
+            // Index question in pgvector to build a searchable question bank
             List<Float> embedding = embeddingService.embed(topicName + " " + saved.getQuestion());
             vectorDatabaseService.upsert(
                 "question-" + saved.getId(),

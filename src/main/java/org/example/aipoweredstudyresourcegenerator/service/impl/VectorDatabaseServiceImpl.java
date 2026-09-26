@@ -2,80 +2,68 @@ package org.example.aipoweredstudyresourcegenerator.service.impl;
 import org.example.aipoweredstudyresourcegenerator.service.*;
 
 import org.example.aipoweredstudyresourcegenerator.service.VectorDatabaseService;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VectorDatabaseServiceImpl implements VectorDatabaseService {
 
-    @Value("${pinecone.api-key}")
-    private String apiKey;
-
-    @Value("${pinecone.index-host}")
-    private String indexHost;
-
-    private final RestTemplate restTemplate;
+    private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
 
-    public VectorDatabaseServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper) {
-        this.restTemplate = restTemplate;
+    public VectorDatabaseServiceImpl(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
+        this.jdbcTemplate = jdbcTemplate;
         this.objectMapper = objectMapper;
+        initTable();
     }
 
-    private HttpHeaders headers() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Api-Key", apiKey);
-        return headers;
+    private void initTable() {
+        jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector;");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS vector_store (" +
+                "id VARCHAR(255) PRIMARY KEY, " +
+                "embedding vector(384), " +
+                "metadata JSONB);");
     }
 
     public void upsert(String id, List<Float> values, Map<String, Object> metadata) {
-        Map<String, Object> vector = new HashMap<>();
-        vector.put("id", id);
-        vector.put("values", values);
-        vector.put("metadata", metadata);
+        String vectorStr = "[" + values.stream().map(String::valueOf).collect(Collectors.joining(",")) + "]";
+        String metadataStr;
+        try {
+            metadataStr = objectMapper.writeValueAsString(metadata);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize metadata", e);
+        }
 
-        Map<String, Object> body = Map.of("vectors", List.of(vector));
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers());
-        restTemplate.exchange(indexHost + "/vectors/upsert", HttpMethod.POST, request, String.class);
+        String sql = "INSERT INTO vector_store (id, embedding, metadata) VALUES (?, ?::vector, ?::jsonb) " +
+                     "ON CONFLICT (id) DO UPDATE SET embedding = EXCLUDED.embedding, metadata = EXCLUDED.metadata";
+        jdbcTemplate.update(sql, id, vectorStr, metadataStr);
     }
 
     public List<QueryMatch> query(List<Float> values, int topK) {
-        Map<String, Object> body = Map.of(
-            "vector", values,
-            "topK", topK,
-            "includeMetadata", true
-        );
+        String vectorStr = "[" + values.stream().map(String::valueOf).collect(Collectors.joining(",")) + "]";
+        
+        String sql = "SELECT id, metadata, 1 - (embedding <=> ?::vector) as score " +
+                     "FROM vector_store ORDER BY embedding <=> ?::vector LIMIT ?";
 
-        HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers());
-        ResponseEntity<String> response = restTemplate.exchange(indexHost + "/query", HttpMethod.POST, request, String.class);
-
-        List<QueryMatch> matches = new ArrayList<>();
-        try {
-            JsonNode root = objectMapper.readTree(response.getBody());
-            JsonNode matchesNode = root.get("matches");
-            if (matchesNode == null || matchesNode.isNull()) return matches;
-
-            for (JsonNode match : matchesNode) {
-                String matchId = match.get("id").asText();
-                float score = match.get("score").floatValue();
-                Map<String, String> meta = new HashMap<>();
-                if (match.has("metadata")) {
-                    match.get("metadata").fields().forEachRemaining(e ->
-                        meta.put(e.getKey(), e.getValue().asText()));
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            String id = rs.getString("id");
+            float score = rs.getFloat("score");
+            String metaStr = rs.getString("metadata");
+            Map<String, String> meta = new HashMap<>();
+            if (metaStr != null) {
+                try {
+                    meta = objectMapper.readValue(metaStr, new TypeReference<Map<String, String>>() {});
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to parse metadata", e);
                 }
-                matches.add(new QueryMatch(matchId, score, meta));
             }
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse Pinecone query response", e);
-        }
-        return matches;
+            return new QueryMatch(id, score, meta);
+        }, vectorStr, vectorStr, topK);
     }
 }
 

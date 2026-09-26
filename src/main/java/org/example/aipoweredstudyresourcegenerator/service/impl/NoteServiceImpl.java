@@ -20,7 +20,7 @@ public class NoteServiceImpl implements NoteService {
     private final EmbeddingService embeddingService;
     private final VectorDatabaseService vectorDatabaseService;
 
-    // If Pinecone returns a match above this score, treat it as the same topic
+    // If pgvector returns a match above this score, treat it as the same topic
     private static final float SIMILARITY_THRESHOLD = 0.75f;
 
     public NoteServiceImpl(AiChatService openAi, NoteRepo repo,
@@ -37,7 +37,7 @@ public class NoteServiceImpl implements NoteService {
             return new ResponseEntity<>(repo.findByTopic(topic), HttpStatus.OK);
         }
 
-        // 2. Semantic match in Pinecone â€” avoids regenerating nearly identical notes
+        // 2. Semantic match in pgvector - avoids regenerating nearly identical notes
         List<Float> queryEmbedding = embeddingService.embed(topic);
         List<VectorDatabaseService.QueryMatch> matches = vectorDatabaseService.query(queryEmbedding, 3);
 
@@ -53,7 +53,7 @@ public class NoteServiceImpl implements NoteService {
             }
         }
 
-        // 3. Generate new note, save to PostgreSQL, index in Pinecone
+        // 3. Generate new note, save to PostgreSQL, index in pgvector
         String prompt = "Write a detailed study note on the topic: " + topic;
         String noteContent = openAi.getResponse(prompt);
 
