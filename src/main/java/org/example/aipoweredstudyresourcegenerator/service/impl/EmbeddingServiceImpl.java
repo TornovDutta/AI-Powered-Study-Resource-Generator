@@ -27,7 +27,7 @@ public class EmbeddingServiceImpl implements EmbeddingService {
         this.objectMapper = objectMapper;
     }
 
-    private static final String EMBEDDING_URL = "https://router.huggingface.co/hf-inference/models/sentence-transformers/all-MiniLM-L6-v2";
+    private static final String EMBEDDING_URL = "https://router.huggingface.co/hf-inference/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2";
 
     public List<Float> embed(String text) {
         HttpHeaders headers = new HttpHeaders();
