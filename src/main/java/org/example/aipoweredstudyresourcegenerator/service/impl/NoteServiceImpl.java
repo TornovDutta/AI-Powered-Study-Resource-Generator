@@ -37,6 +37,8 @@ public class NoteServiceImpl implements NoteService {
             return new ResponseEntity<>(repo.findByTopic(topic), HttpStatus.OK);
         }
 
+        System.out.println("ok");
+
         // 2. Semantic match in pgvector - avoids regenerating nearly identical notes
         List<Float> queryEmbedding = embeddingService.embed(topic);
         List<VectorDatabaseService.QueryMatch> matches = vectorDatabaseService.query(queryEmbedding, 3);
@@ -53,6 +55,8 @@ public class NoteServiceImpl implements NoteService {
             }
         }
 
+        System.out.println("ok");
+
         // 3. Generate new note, save to PostgreSQL, index in pgvector
         String prompt = "Write a detailed study note on the topic: " + topic;
         String noteContent = openAi.getResponse(prompt);
@@ -61,6 +65,8 @@ public class NoteServiceImpl implements NoteService {
         newNote.setTopic(topic);
         newNote.setNote(noteContent);
         Note saved = repo.save(newNote);
+
+        System.out.println("ok");
 
         // Embed a summary of the content for richer semantic matching
         String embeddingInput = topic + " " + noteContent.substring(0, Math.min(500, noteContent.length()));
