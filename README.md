@@ -1,23 +1,71 @@
-# AI-Powered Study Resource Generator (Gen AI)
+# AI-Powered Study Resource Generator
+
+![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/spring%20boot-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/postgresql-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 
 A highly scalable, production-ready backend system that leverages Generative AI to dynamically generate study notes, MCQ tests, and daily practice papers. Designed with performance and cost-optimization in mind, this system uses advanced Retrieval-Augmented Generation (RAG) concepts and semantic caching to ensure it never processes the same query twice.
 
 ---
 
-## Key System Design Principles
+## Table of Contents
 
-This project was built with enterprise-level system design patterns to handle high traffic and provide a seamless user experience:
-
-- **Scalability**: Designed to scale horizontally. The stateless Spring Boot backend can be replicated across multiple instances behind a load balancer, while PostgreSQL with pgvector handles both relational data and vector scaling effortlessly.
-- **High Availability**: The architecture ensures high uptime by decoupling the heavy AI generation tasks from the core retrieval logic. Even if the LLM provider experiences latency, cached semantic hits are served instantly.
-- **Data Consistency**: Relies on strict ACID properties of PostgreSQL for user data and scheduling logic, maintaining seamless consistency with the pgvector extension to ensure the semantic search index stays in sync with the primary data store.
-- **Cost-Optimization (Semantic Caching)**: Instead of hitting the LLM for every request (which is costly and slow), the system embeds user queries and checks the vector database for a semantic match (cosine similarity ≥ 0.85). Only genuinely new content triggers a Gen AI generation call, drastically reducing API costs and response times.
+- [Features](#features)
+- [Architecture & Design](#architecture--design)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [API Reference](#api-reference)
+- [Author](#author)
 
 ---
 
-## Generative AI & RAG Architecture
+## Features
 
-Most AI study tools naively pass every user prompt to an LLM. This system employs an intelligent semantic caching layer:
+- **🧠 Dynamic Notes Generation**: On-demand, detailed study materials powered by state-of-the-art Gen AI models (Qwen / LLaMA).
+- **📝 Automated Assessments**: Generates 10-question MCQs with answers. Supports Daily Practice Papers (DPPs) for spaced repetition and streak building.
+- **⚡ Semantic Caching**: Uses vector similarity search to retrieve previously generated answers, bypassing the LLM layer for duplicate or highly similar queries, saving time and API costs.
+- **📅 Asynchronous Task Scheduling**: Users can schedule tests and DPPs to arrive in their inbox at specific times via email integrations.
+- **🔍 Semantic Search Engine**: Ask natural language questions and retrieve the most relevant notes from the global database, ranked by semantic meaning.
+- **🔒 Secure Authentication**: Robust session management using GitHub OAuth2 integration.
+
+---
+
+## Architecture & Design
+
+### Key System Design Principles
+
+This project was built with enterprise-level system design patterns to handle high traffic and provide a seamless user experience:
+
+- **Scalability**: The stateless Spring Boot backend can be replicated across multiple instances behind a load balancer, while PostgreSQL with pgvector handles both relational data and vector scaling effortlessly.
+- **High Availability**: Decoupling the heavy AI generation tasks from core retrieval logic ensures high uptime. Cached semantic hits are served instantly even if the LLM provider experiences latency.
+- **Data Consistency**: Relies on strict ACID properties of PostgreSQL for user data and scheduling logic, maintaining seamless consistency with the pgvector extension.
+- **Cost-Optimization**: Instead of hitting the LLM for every request, the system embeds user queries and checks the vector database for a semantic match (cosine similarity ≥ 0.85).
+
+### System Workflow
+
+```text
+                        ┌─────────────────────────┐
+                        │      Spring Boot API    │
+                        │  (Java 17, Spring AI)   │
+                        └────────────┬────────────┘
+                                     │
+               ┌─────────────────────┼─────────────────────┐
+               │                                           │
+               ▼                                           ▼
+    ┌──────────────────┐                  ┌────────────────────────────────┐
+    │   Hugging Face   │                  │           PostgreSQL           │
+    │  (Gen AI Layer)  │                  │          (Primary DB)          │
+    │                  │                  │                                │
+    │  Qwen / LLaMA    │                  │  Notes, Topics, Questions      │
+    │  (generation)    │                  │                                │
+    │                  │                  │       [ pgvector ext ]         │
+    │  all-MiniLM-L6-v2│                  │  Vector index (semantic search)│
+    │  (embeddings)    │                  │  384-dim cosine distance       │
+    └──────────────────┘                  └────────────────────────────────┘
+```
+
+### RAG & Semantic Caching Flow
 
 ```text
 User Request
@@ -43,127 +91,108 @@ User Request
 
 ---
 
-## Core Features
-
-- **Dynamic Notes Generation**: On-demand, detailed study materials powered by state-of-the-art Gen AI models.
-- **Automated Assessments (Tests & DPPs)**: Generates 10-question MCQs with answers. Supports Daily Practice Papers (DPPs) for spaced repetition and streak building.
-- **Asynchronous Task Scheduling**: Users can schedule tests and DPPs to arrive in their inbox at specific times via email integrations.
-- **Semantic Search Engine**: Ask a natural language question and retrieve the most relevant notes from the global database, ranked by semantic meaning rather than basic keyword matching.
-- **Secure Authentication**: Robust session management using GitHub OAuth2.
-
----
-
-## System Architecture
-
-```text
-                        ┌─────────────────────────┐
-                        │      Spring Boot API    │
-                        │  (Java 17, Spring AI)   │
-                        └────────────┬────────────┘
-                                     │
-               ┌─────────────────────┼─────────────────────┐
-               │                                           │
-               ▼                                           ▼
-    ┌──────────────────┐                  ┌────────────────────────────────┐
-    │   Hugging Face   │                  │           PostgreSQL           │
-    │  (Gen AI Layer)  │                  │          (Primary DB)          │
-    │                  │                  │                                │
-    │  Qwen / LLaMA    │                  │  Notes, Topics, Questions      │
-    │  (generation)    │                  │                                │
-    │                  │                  │       [ pgvector ext ]         │
-    │  all-MiniLM-L6-v2│                  │  Vector index (semantic search)│
-    │  (embeddings)    │                  │  384-dim cosine distance       │
-    └──────────────────┘                  └────────────────────────────────┘
-```
-
----
-
 ## Tech Stack
 
-- **Backend Framework**: Spring Boot 3.5 (Java 17, JPA, Spring Security, Scheduling)
-- **Generative AI Integration**: Spring AI 1.0, Hugging Face (Qwen / LLaMA, all-MiniLM-L6-v2)
+- **Backend Framework**: Spring Boot 3.5, Java 17, Spring Data JPA, Spring Security, Spring Scheduling
+- **Generative AI Integration**: Spring AI 1.0, Hugging Face API
+- **Models Used**: Qwen / LLaMA (Text Generation), all-MiniLM-L6-v2 (Embeddings)
 - **Databases**: PostgreSQL (Relational) with `pgvector` extension for Semantic Search
 - **Authentication**: OAuth 2.0 (GitHub)
-- **Infrastructure / DevOps**: Docker, Docker Compose
+- **Infrastructure / DevOps**: Docker, Docker Compose, Maven
 
 ---
 
-## API Reference (RESTful)
+## Getting Started
 
-All routes are prefixed with `/api/v1` and require GitHub OAuth2 authentication (except health checks).
+### Prerequisites
+- Docker and Docker Compose
+- Java 17+ (If running without Docker for the backend)
+- Maven (If building locally)
 
-### Notes
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/note?topic=` | Get or generate a note for a topic (Semantic Cache first) |
-| `GET` | `/note/search?query=` | Semantic search across all generated notes |
+### 1. Environment Configuration
 
-### Tests & DPPs
-| Method | Path | Body | Description |
-|--------|------|------|-------------|
-| `POST` | `/tests/` | `{ "topic": "..." }` | Generate a test immediately |
-| `POST` | `/tests/schedule` | `{ "topic": "...", "date": "...", "time": "..." }` | Schedule a one-time test via email |
-| `GET` | `/dpp?topic=` | — | Generate a DPP immediately |
-| `POST` | `/dpp/schedule` | `{ "topic": "...", "time": "HH:MM" }` | Schedule a recurring daily DPP |
-| `DELETE` | `/tests/schedule` | — | Cancel scheduled test or DPP |
-
----
-
-## Setup & Installation
-
-### 1. Environment Variables
-Create a `.env` file at the root:
+Create a `.env` file at the root directory of the project:
 
 ```env
 # Gen AI (Hugging Face)
 HF_MODEL=Qwen/Qwen2.5-72B-Instruct
-HF_TOKEN=
+HF_TOKEN=your_hugging_face_token_here
 
-# Primary Database (used if running outside of Docker Compose)
-DB_URL=jdbc:postgresql://localhost:5432/studydb
+# Primary Database
+DB_URL=jdbc:postgresql://db:5432/studydb
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 
 # SMTP Mail Server
-MAIL_USERNAME=
-MAIL_PASSWORD=
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
 
 # OAuth2 Authentication
-GITHUB_CLIENT_ID=
-GITHUB_CLIENT_SECRET=
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
 
 # Security
 ALLOWED_ORIGINS=http://localhost:3000
 ```
 
-### 2. Run the Application with Docker Compose
-The easiest way to start the system, including the PostgreSQL database with `pgvector` and the Spring Boot application, is using Docker Compose. Ensure you have Docker installed.
+### 2. Run the Application
+
+The easiest way to start the entire system (including PostgreSQL with pgvector and the Spring Boot API) is via Docker Compose:
 
 ```bash
 git clone https://github.com/TornovDutta/AI-Powered-Study-Resource-Generator.git
 cd AI-Powered-Study-Resource-Generator
 
-# Package the application
+# Package the application (skip tests for faster build)
 ./mvnw clean package -DskipTests
 
-# Run the complete stack (app + database)
+# Run the complete stack
 docker-compose up --build -d
 ```
 
-### 3. Alternative: Run locally (IDE)
-If you prefer to run the application from your IDE (e.g., IntelliJ IDEA), you can start just the database using Docker Compose, or have your own PostgreSQL instance with the `pgvector` extension installed.
+### 3. Alternative: Run Locally via IDE
 
-```bash
-# Start only the database container
-docker-compose up db -d
+If you prefer to run the Spring Boot application locally while keeping the database in Docker:
 
-# Run the Spring Boot app locally
-./mvnw spring-boot:run
-```
+1. Update `DB_URL` in your `.env` to `jdbc:postgresql://localhost:5432/studydb`
+2. Start the database container:
+   ```bash
+   docker-compose up db -d
+   ```
+3. Run the application:
+   ```bash
+   ./mvnw spring-boot:run
+   ```
 
-The server will start on `http://localhost:8080/api/v1`.
-Access the Swagger UI at `http://localhost:8080/api/v1/swagger-ui.html`.
+**Accessing the Application:**
+- API Base URL: `http://localhost:8080/api/v1`
+- Swagger UI Documentation: `http://localhost:8080/api/v1/swagger-ui.html`
 
 ---
+
+## API Reference
+
+*Note: All endpoints are prefixed with `/api/v1` and require GitHub OAuth2 authentication (except health check endpoints).*
+
+### Notes API
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET`  | `/note?topic={topic}` | Fetch or generate study notes for a specific topic (Semantic Cache first). |
+| `GET`  | `/note/search?query={query}` | Perform a semantic search across all previously generated notes. |
+
+### Tests & DPPs API
+
+| Method | Endpoint | Request Body | Description |
+|--------|----------|--------------|-------------|
+| `POST` | `/tests/` | `{ "topic": "..." }` | Generate an MCQ test immediately. |
+| `POST` | `/tests/schedule` | `{ "topic": "...", "date": "...", "time": "..." }` | Schedule a one-time test via email. |
+| `GET`  | `/dpp?topic={topic}` | — | Generate a Daily Practice Paper (DPP) immediately. |
+| `POST` | `/dpp/schedule` | `{ "topic": "...", "time": "HH:MM" }` | Schedule a recurring daily DPP. |
+| `DELETE`| `/tests/schedule` | — | Cancel a scheduled test or DPP. |
+
+---
+
+## Author
 
 Built by [Tornov Dutta](https://github.com/TornovDutta) - Passionate about building scalable Backend Systems and Generative AI applications.
